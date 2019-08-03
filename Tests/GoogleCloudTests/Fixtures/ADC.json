@@ -1,0 +1,6 @@
+{
+    "client_id": "IDSTRING.apps.googleusercontent.com",
+    "client_secret": "SECRETSTRING",
+    "refresh_token": "REFRESHTOKEN",
+    "type": "authorized_user"
+}
