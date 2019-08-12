@@ -31,7 +31,7 @@ API from your local workstation.
 In your `Package.swift` file, add the following
 
 ```swift
-.package(url: "https://github.com/vapor-community/GoogleCloudKit.git", from: "1.0.0-aplha.1")
+.package(url: "https://github.com/vapor-community/GoogleCloudKit.git", from: "1.0.0-alpha.1")
 ```
 Now setup the configuration.
 
