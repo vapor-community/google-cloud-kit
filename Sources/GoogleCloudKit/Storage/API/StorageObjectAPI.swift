@@ -69,11 +69,86 @@ public protocol StorageObjectAPI {
                             contentType: String,
                             queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageObject>
     
-//    func list(bucket: String, queryParameters: [String: String]?) -> EventLoopFuture<StorageObjectList>
-//    func patch(bucket: String, objectName: String, object: GoogleStorageObject?, queryParameters: [String: String]?) -> EventLoopFuture<GoogleStorageObject>
-//    func rewrite(destinationBucket: String, destinationObject: String, sourceBucket: String, sourceObject: String, object: GoogleStorageObject?, queryParameters: [String: String]?) -> EventLoopFuture<StorageRewriteObject>
-//    func update(bucket: String, objectName: String, object: GoogleStorageObject, queryParameters: [String: String]?) -> EventLoopFuture<GoogleStorageObject>
-//    func watchAll(bucket: String, notificationChannel: StorageNotificationChannel, queryParameters: [String: String]?) -> EventLoopFuture<StorageNotificationChannel>
+    /// Retrieves a list of objects matching the criteria.
+    /// - Parameter bucket: Name of the bucket in which to look for objects.
+    /// - Parameter queryParameters: [Optional query parameters](https://cloud.google.com/storage/docs/json_api/v1/list/insert#parameters)
+    func list(bucket: String, queryParameters: [String: String]?) -> EventLoopFuture<StorageObjectList>
+    
+    /// Updates a data blob's associated metadata. This method supports patch semantics.
+    /// - Parameter bucket: Name of the bucket in which the object resides.
+    /// - Parameter object: Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
+    /// - Parameter metadata: The relevant portions of an object resource.
+    /// - Parameter queryParameters: [Optional query parameters](https://cloud.google.com/storage/docs/json_api/v1/objects/patch#parameters)
+    func patch(bucket: String,
+               object: String,
+               metadata: [String: Any],
+               queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageObject>
+    
+    /// Rewrites a source object to a destination object. Optionally overrides metadata.
+    /// - Parameter destinationBucket: Name of the bucket in which to store the new object. Overrides the provided object metadata's bucket value, if any.
+    /// - Parameter destinationObject: Name of the new object. Required when the object metadata is not otherwise provided. Overrides the object metadata's name value, if any. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
+    /// - Parameter sourceBucket: Name of the bucket in which to find the source object.
+    /// - Parameter sourceObject: Name of the source object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
+    /// - Parameter metadata: Metadata to apply to the rewritten object.
+    /// - Parameter queryParameters: [Optional query parameters](https://cloud.google.com/storage/docs/json_api/v1/objects/rewrite#parameters)
+    func rewrite(destinationBucket: String,
+                 destinationObject: String,
+                 sourceBucket: String,
+                 sourceObject: String,
+                 metadata: [String: Any],
+                 queryParameters: [String: String]?) -> EventLoopFuture<StorageRewriteObject>
+    
+    /// Updates an object's metadata.
+    /// - Parameter bucket: Name of the bucket in which the object resides.
+    /// - Parameter object: Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
+    /// - Parameter acl: Access controls on the object, containing one or more objectAccessControls Resources.
+    /// - Parameter cacheControl: Cache-Control directive for the object data. If omitted, and the object is accessible to all anonymous users, the default will be public, max-age=3600.
+    /// - Parameter contentDisposition: Content-Disposition of the object data.
+    /// - Parameter contentEncoding: Content-Encoding of the object data.
+    /// - Parameter contentLanguage: Content-Language of the object data.
+    /// - Parameter contentType: Content-Type of the object data. If an object is stored without a Content-Type, it is served as application/octet-stream.
+    /// - Parameter eventBasedHold: Whether or not the object is subject to an event-based hold.
+    /// - Parameter metadata: User-provided metadata, in key/value pairs.
+    /// - Parameter temporaryHold: Whether or not the object is subject to a temporary hold.
+    /// - Parameter queryParameters: [Optional query parameters](https://cloud.google.com/storage/docs/json_api/v1/objects/update#parameters)
+    func update(bucket: String,
+                object: String,
+                acl: [[String: Any]],
+                cacheControl: String?,
+                contentDisposition: String?,
+                contentEncoding: String?,
+                contentLanguage: String?,
+                contentType: String?,
+                eventBasedHold: Bool?,
+                metadata: [String: String]?,
+                temporaryHold: Bool?,
+                queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageObject>
+    
+    /// Watch for changes on all objects in a bucket.
+    /// - Parameter bucket: Name of the bucket in which to look for objects.
+    /// - Parameter kind: Identifies this as a notification channel used to watch for changes to a resource. Value: the fixed string "api#channel".
+    /// - Parameter id: A UUID or similar unique string that identifies this channel.
+    /// - Parameter resourceId: An opaque ID that identifies the resource being watched on this channel. Stable across different API versions.
+    /// - Parameter resourceUri: A version-specific identifier for the watched resource.
+    /// - Parameter token: An arbitrary string delivered to the target address with each notification delivered over this channel. Optional.
+    /// - Parameter expiration: Date and time of notification channel expiration, expressed as a Unix timestamp, in milliseconds. Optional.
+    /// - Parameter type: The type of delivery mechanism used for this channel. Value: the fixed string `"WEBHOOK"`.
+    /// - Parameter address: The address where notifications are delivered for this channel.
+    /// - Parameter params: Additional parameters controlling delivery channel behavior. Optional.
+    /// - Parameter payload: A Boolean value to indicate whether payload is wanted. Optional.
+    /// - Parameter queryParameters: [Optional query parameters](https://cloud.google.com/storage/docs/json_api/v1/objects/watchAll#parameters)
+    func watchAll(bucket: String,
+                  kind: String,
+                  id: String,
+                  resourceId: String,
+                  resourceUri: String,
+                  token: String?,
+                  expiration: Date?,
+                  type: String,
+                  address: String,
+                  params: [String: String]?,
+                  payload: Bool?,
+                  queryParameters: [String: String]?) -> EventLoopFuture<StorageNotificationChannel>
 }
 
 extension StorageObjectAPI {
@@ -122,28 +197,92 @@ extension StorageObjectAPI {
                                    name: String,
                                    contentType: String,
                                    queryParameters: [String: String]? = nil) -> EventLoopFuture<GoogleCloudStorageObject> {
-        return createSimpleUpload(bucket: bucket, data: data, name: name, contentType: contentType, queryParameters: queryParameters)
+        return createSimpleUpload(bucket: bucket,
+                                  data: data,
+                                  name: name,
+                                  contentType: contentType,
+                                  queryParameters: queryParameters)
     }
     
-//    public func list(bucket: String, queryParameters: [String: String]? = nil) -> EventLoopEventLoopFuture<StorageObjectList> {
-//        return try list(bucket: bucket, queryParameters: queryParameters)
-//    }
-//
-//    public func patch(bucket: String, objectName: String, object: GoogleStorageObject? = nil, queryParameters: [String: String]? = nil) -> EventLoopFuture<GoogleStorageObject> {
-//        return try patch(bucket: bucket, objectName: objectName, object: object, queryParameters: queryParameters)
-//    }
-//
-//    public func rewrite(destinationBucket: String, destinationObject: String, sourceBucket: String, sourceObject: String, object: GoogleStorageObject? = nil, queryParameters: [String: String]? = nil) -> EventLoopFuture<StorageRewriteObject> {
-//        return try rewrite(destinationBucket: destinationBucket, destinationObject: destinationObject, sourceBucket: sourceBucket, sourceObject: sourceObject, object: object, queryParameters: queryParameters)
-//    }
-//
-//    public func update(bucket: String, objectName: String, object: GoogleStorageObject, queryParameters: [String: String]? = nil) -> EventLoopFuture<GoogleStorageObject> {
-//        return try update(bucket: bucket, objectName: objectName, object: object, queryParameters: queryParameters)
-//    }
-//
-//    public func watchAll(bucket: String, notificationChannel: StorageNotificationChannel, queryParameters: [String: String]? = nil) -> EventLoopFuture<StorageNotificationChannel> {
-//        return try watchAll(bucket: bucket, notificationChannel: notificationChannel, queryParameters: queryParameters)
-//    }
+    public func list(bucket: String, queryParameters: [String: String]? = nil) -> EventLoopFuture<StorageObjectList> {
+        return list(bucket: bucket, queryParameters: queryParameters)
+    }
+
+    public func patch(bucket: String,
+                      object: String,
+                      metadata: [String: Any],
+                      queryParameters: [String: String]? = nil) -> EventLoopFuture<GoogleCloudStorageObject> {
+        return patch(bucket: bucket,
+                     object: object,
+                     metadata: metadata,
+                     queryParameters: queryParameters)
+    }
+
+    public func rewrite(destinationBucket: String,
+                        destinationObject: String,
+                        sourceBucket: String,
+                        sourceObject: String,
+                        metadata: [String: Any],
+                        queryParameters: [String: String]? = nil) -> EventLoopFuture<StorageRewriteObject> {
+        return rewrite(destinationBucket: destinationBucket,
+                       destinationObject: destinationObject,
+                       sourceBucket: sourceBucket,
+                       sourceObject: sourceObject,
+                       metadata: metadata,
+                       queryParameters: queryParameters)
+    }
+    
+    public func update(bucket: String,
+                       object: String,
+                       acl: [[String: Any]],
+                       cacheControl: String?,
+                       contentDisposition: String?,
+                       contentEncoding: String?,
+                       contentLanguage: String?,
+                       contentType: String?,
+                       eventBasedHold: Bool?,
+                       metadata: [String: String]?,
+                       temporaryHold: Bool?,
+                       queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageObject> {
+        return update(bucket: bucket,
+                      object: object,
+                      acl: acl,
+                      cacheControl: cacheControl,
+                      contentDisposition: contentDisposition,
+                      contentEncoding: contentEncoding,
+                      contentLanguage: contentLanguage,
+                      contentType: contentType,
+                      eventBasedHold: eventBasedHold,
+                      metadata: metadata,
+                      temporaryHold: temporaryHold,
+                      queryParameters: queryParameters)
+    }
+    
+    public func watchAll(bucket: String,
+                         kind: String,
+                         id: String,
+                         resourceId: String,
+                         resourceUri: String,
+                         token: String?,
+                         expiration: Date?,
+                         type: String,
+                         address: String,
+                         params: [String: String]?,
+                         payload: Bool?,
+                         queryParameters: [String: String]?) -> EventLoopFuture<StorageNotificationChannel> {
+        return watchAll(bucket: bucket,
+                        kind: kind,
+                        id: id,
+                        resourceId: resourceId,
+                        resourceUri: resourceUri,
+                        token: token,
+                        expiration: expiration,
+                        type: type,
+                        address: address,
+                        params: params,
+                        payload: payload,
+                        queryParameters: queryParameters)
+    }
 }
 
 public final class GoogleCloudStorageObjectAPI: StorageObjectAPI {
@@ -244,70 +383,158 @@ public final class GoogleCloudStorageObjectAPI: StorageObjectAPI {
         
         return request.send(method: .POST, headers: headers, path: "\(uploadEndpoint)/\(bucket)/o", query: queryParams, body: .data(data))
     }
-//    
-//    /// Retrieves a list of objects matching the criteria.
-//    public func list(bucket: String, queryParameters: [String: String]?) -> EventLoopEventLoopFuture<StorageObjectList> {
-//        var queryParams = ""
-//        if let queryParameters = queryParameters {
-//            queryParams = queryParameters.queryParameters
-//        }
-//        
-//        return try request.send(method: .GET, path: "\(endpoint)/\(bucket)/o)", query: queryParams)
-//    }
-//    
-//    /// Updates a data blob's associated metadata. This method supports patch semantics
-//    public func patch(bucket: String, objectName: String, object: GoogleStorageObject?, queryParameters: [String: String]?) -> EventLoopFuture<GoogleStorageObject> {
-//        var queryParams = ""
-//        if let queryParameters = queryParameters {
-//            queryParams = queryParameters.queryParameters
-//        }
-//        
-//        var body = ""
-//        
-//        if let object = object {
-//            body = try JSONSerialization.data(withJSONObject: try object.toEncodedDictionary()).convert(to: String.self)
-//        }
-//        
-//        return try request.send(method: .PATCH, path: "\(endpoint)/\(bucket)/o)", query: queryParams, body: body.convertToHTTPBody())
-//    }
-//    
-//    /// Rewrites a source object to a destination object. Optionally overrides metadata.
-//    public func rewrite(destinationBucket: String, destinationObject: String, sourceBucket: String, sourceObject: String, object: GoogleStorageObject?, queryParameters: [String: String]?) -> EventLoopFuture<StorageRewriteObject> {
-//        var queryParams = ""
-//        if let queryParameters = queryParameters {
-//            queryParams = queryParameters.queryParameters
-//        }
-//        
-//        var body = ""
-//        
-//        if let object = object {
-//            body = try JSONSerialization.data(withJSONObject: try object.toEncodedDictionary()).convert(to: String.self)
-//        }
-//        
-//        return try request.send(method: .POST, path: "\(endpoint)/\(sourceBucket)/o/\(sourceObject)/rewriteTo/b/\(destinationBucket)/o/\(destinationObject)", query: queryParams, body: body.convertToHTTPBody())
-//    }
-//    
-//    /// Updates an object's metadata.
-//    public func update(bucket: String, objectName: String, object: GoogleStorageObject, queryParameters: [String: String]?) -> EventLoopFuture<GoogleStorageObject> {
-//        var queryParams = ""
-//        if let queryParameters = queryParameters {
-//            queryParams = queryParameters.queryParameters
-//        }
-//        
-//        let body = try JSONSerialization.data(withJSONObject: try object.toEncodedDictionary()).convertToHTTPBody()
-//        
-//        return try request.send(method: .PUT, path: "\(endpoint)/\(bucket)/o)", query: queryParams, body: body)
-//    }
-//    
-//    /// Watch for changes on all objects in a bucket.
-//    public func watchAll(bucket: String, notificationChannel: StorageNotificationChannel, queryParameters: [String: String]?) -> EventLoopFuture<StorageNotificationChannel> {
-//        var queryParams = ""
-//        if let queryParameters = queryParameters {
-//            queryParams = queryParameters.queryParameters
-//        }
-//        
-//        let body = try JSONSerialization.data(withJSONObject: try notificationChannel.toEncodedDictionary()).convertToHTTPBody()
-//        
-//        return try request.send(method: .POST, path: "\(endpoint)/\(bucket)/o/watch)", query: queryParams, body: body)
-//    }
+    
+    public func list(bucket: String, queryParameters: [String: String]?) -> EventLoopFuture<StorageObjectList> {
+        var queryParams = ""
+        if let queryParameters = queryParameters {
+            queryParams = queryParameters.queryParameters
+        }
+        
+        return request.send(method: .GET, path: "\(endpoint)/\(bucket)/o)", query: queryParams)
+    }
+    
+    public func patch(bucket: String,
+                      object: String,
+                      metadata: [String: Any],
+                      queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageObject> {
+        var queryParams = ""
+        if let queryParameters = queryParameters {
+            queryParams = queryParameters.queryParameters
+        }
+        
+        do {
+            let requestBody = try JSONSerialization.data(withJSONObject: metadata)
+            return request.send(method: .PATCH, path: "\(endpoint)/\(bucket)/o)", query: queryParams, body: .data(requestBody))
+        } catch {
+            return request.httpClient.eventLoopGroup.next().makeFailedFuture(error)
+        }
+    }
+    
+    public func rewrite(destinationBucket: String,
+                        destinationObject: String,
+                        sourceBucket: String,
+                        sourceObject: String,
+                        metadata: [String: Any],
+                        queryParameters: [String: String]?) -> EventLoopFuture<StorageRewriteObject> {
+        var queryParams = ""
+        if let queryParameters = queryParameters {
+            queryParams = queryParameters.queryParameters
+        }
+        
+        do {
+            let requestBody = try JSONSerialization.data(withJSONObject: metadata)
+            return request.send(method: .POST,
+                                path: "\(endpoint)/\(sourceBucket)/o/\(sourceObject)/rewriteTo/b/\(destinationBucket)/o/\(destinationObject)",
+                                query: queryParams,
+                                body: .data(requestBody))
+        } catch {
+            return request.httpClient.eventLoopGroup.next().makeFailedFuture(error)
+        }
+    }
+    
+    public func update(bucket: String,
+                       object: String,
+                       acl: [[String: Any]],
+                       cacheControl: String?,
+                       contentDisposition: String?,
+                       contentEncoding: String?,
+                       contentLanguage: String?,
+                       contentType: String?,
+                       eventBasedHold: Bool?,
+                       metadata: [String: String]?,
+                       temporaryHold: Bool?,
+                       queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageObject> {
+        var queryParams = ""
+        if let queryParameters = queryParameters {
+            queryParams = queryParameters.queryParameters
+        }
+        
+        var body: [String: Any] = ["acl": acl]
+        
+        if let cacheControl = cacheControl {
+            body["cacheControl"] = cacheControl
+        }
+        
+        if let contentDisposition = contentDisposition {
+            body["contentDisposition"] = contentDisposition
+        }
+        
+        if let contentEncoding = contentEncoding {
+            body["contentEncoding"] = contentEncoding
+        }
+        
+        if let contentLanguage = contentLanguage {
+            body["contentLanguage"] = contentLanguage
+        }
+        
+        if let contentType = contentType {
+            body["contentType"] = contentType
+        }
+        
+        if let eventBasedHold = eventBasedHold {
+            body["eventBasedHold"] = eventBasedHold
+        }
+        
+        if let metadata = metadata {
+            metadata.forEach { body["cacheControl[\($0)]"] = $1 }
+        }
+        
+        if let temporaryHold = temporaryHold {
+            body["temporaryHold"] = temporaryHold
+        }
+        
+        do {
+            let requestBody = try JSONSerialization.data(withJSONObject: body)
+            return request.send(method: .PUT, path: "\(endpoint)/\(bucket)/o/\(object)", query: queryParams, body: .data(requestBody))
+        } catch {
+            return request.httpClient.eventLoopGroup.next().makeFailedFuture(error)
+        }
+    }
+    public func watchAll(bucket: String,
+                         kind: String,
+                         id: String,
+                         resourceId: String,
+                         resourceUri: String,
+                         token: String?,
+                         expiration: Date?,
+                         type: String,
+                         address: String,
+                         params: [String: String]?,
+                         payload: Bool?,
+                         queryParameters: [String: String]?) -> EventLoopFuture<StorageNotificationChannel> {
+        var queryParams = ""
+        if let queryParameters = queryParameters {
+            queryParams = queryParameters.queryParameters
+        }
+        
+        var body: [String: Any] = ["kind": kind,
+                                   "id": id,
+                                   "resourceId": resourceId,
+                                   "resourceUri": resourceUri,
+                                   "type": type,
+                                   "address": address]
+        
+        if let token = token {
+            body["token"] = token
+        }
+        
+        if let expiration = expiration {
+            body["expiration"] = Int(expiration.timeIntervalSince1970) * 1000
+        }
+        
+        if let params = params {
+            params.forEach { body["params[\($0)]"] = $1 }
+        }
+        
+        if let payload = payload {
+            body["payload"] = payload
+        }
+        
+        do {
+            let requestBody = try JSONSerialization.data(withJSONObject: body)
+            return request.send(method: .POST, path: "\(endpoint)/\(bucket)/o/watch", query: queryParams, body: .data(requestBody))
+        } catch {
+            return request.httpClient.eventLoopGroup.next().makeFailedFuture(error)
+        }
+    }
 }

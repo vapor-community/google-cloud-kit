@@ -45,5 +45,5 @@ public struct StorageObjectList: GoogleCloudModel {
     public var prefixes: [String]?
     
     /// The list of items.
-    public var items: [GoogleStorageObject]?
+    public var items: [GoogleCloudStorageObject]?
 }
