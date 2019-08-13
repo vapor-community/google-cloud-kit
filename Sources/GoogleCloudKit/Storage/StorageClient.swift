@@ -17,7 +17,7 @@ public final class GoogleCloudStorageClient {
     public var notifications: StorageNotificationsAPI
     public var object: StorageObjectAPI
 
-    init(configuration: GoogleCloudCredentialsConfiguration, storageConfig: GoogleCloudStorageConfiguration, client: HTTPClient) throws {
+    public init(configuration: GoogleCloudCredentialsConfiguration, storageConfig: GoogleCloudStorageConfiguration, client: HTTPClient) throws {
         // A token implementing OAuthRefreshable. Loaded from credentials from the provider config.
         let refreshableToken = try OAuthCredentialLoader.getRefreshableToken(credentialFilePath: configuration.serviceAccountCredentialsPath,
                                                                              withConfig: storageConfig,
