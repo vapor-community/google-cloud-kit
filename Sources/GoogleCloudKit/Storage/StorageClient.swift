@@ -7,6 +7,7 @@
 
 import Foundation
 import AsyncHTTPClient
+import NIO
 
 public final class GoogleCloudStorageClient {
     public var bucketAccessControl: BucketAccessControlAPI
