@@ -26,7 +26,8 @@ let cloudStorageConfiguration = GoogleCloudStorageConfig.default()
 ### Now create a `GoogleCloudStorageClient` with the configuration.
 ```swift
 let gcs = try GoogleCloudStorageClient(configuration: credentialsConfiguration,
-                                       storageConfiguration: cloudStorageConfiguration)
+                                       storageConfiguration: cloudStorageConfiguration,
+                                       eventLoop: myEventLoop)
 
 ```
 The order of priority for which configured projectID the StorageClient will use is as follows:
@@ -42,7 +43,8 @@ Initializing the client will throw an error if no projectID is set anywhere.
 ```swift
 func createBucket() {
     let gcs = try GoogleCloudStorageClient(configuration: credentialsConfiguration,
-                                           storageConfiguration: cloudStorageConfiguration)
+                                           storageConfiguration: cloudStorageConfiguration,
+                                           eventLoop: myEventLoop)
 
     gcs.buckets.insert(name: "nio-cloud-storage-demo").flatMap { newBucket in
         print(newBucket.selfLink) // prints "https://www.googleapis.com/storage/v1/b/nio-cloud-storage-demo"
