@@ -57,28 +57,29 @@ public final class GoogleCloudStorageRequest: GoogleCloudAPIRequest {
             let request = try HTTPClient.Request(url: "\(path)?\(query)", method: method, headers: _headers, body: body)
             
             return httpClient.execute(request: request).flatMap { response in
-                
-                do {
-                    // If we get a 204 for example in the delete api call just return an empty body to decode.
-                    // https://cloud.google.com/s/results/?q=If+successful%2C+this+method+returns+an+empty+response+body.&p=%2Fstorage%2Fdocs%2F
-                    if response.status == .noContent {
-                        return self.httpClient.eventLoopGroup.next().makeSucceededFuture("{}".data(using: .utf8)!)
+                // If we get a 204 for example in the delete api call just return an empty body to decode.
+                // https://cloud.google.com/s/results/?q=If+successful%2C+this+method+returns+an+empty+response+body.&p=%2Fstorage%2Fdocs%2F
+                if response.status == .noContent {
+                    return self.httpClient.eventLoopGroup.next().makeSucceededFuture("{}".data(using: .utf8)!)
+                }
+
+                guard var byteBuffer = response.body else {
+                    fatalError("Response body from Google is missing! This should never happen.")
+                }
+                let responseData = byteBuffer.readData(length: byteBuffer.readableBytes)!
+
+                guard (200...299).contains(response.status.code) else {
+                    let error: Error
+                    if let jsonError = try? self.responseDecoder.decode(CloudStorageAPIError.self, from: responseData) {
+                        error = jsonError
+                    } else {
+                        let body = response.body?.getString(at: response.body?.readerIndex ?? 0, length: response.body?.readableBytes ?? 0) ?? ""
+                        error = CloudStorageAPIError(error: CloudStorageAPIErrorBody(errors: [], code: Int(response.status.code), message: body))
                     }
-                    
-                    guard var byteBuffer = response.body else {
-                        fatalError("Response body from Google is missing! This should never happen.")
-                    }
-                    let responseData = byteBuffer.readData(length: byteBuffer.readableBytes)!
-                
-                    guard (200...299).contains(response.status.code) else {
-                        let error = try self.responseDecoder.decode(CloudStorageAPIError.self, from: responseData)
-                        return self.httpClient.eventLoopGroup.next().makeFailedFuture(error)
-                    }
-                    return self.httpClient.eventLoopGroup.next().makeSucceededFuture(responseData)
-                    
-                } catch {
+
                     return self.httpClient.eventLoopGroup.next().makeFailedFuture(error)
                 }
+                return self.httpClient.eventLoopGroup.next().makeSucceededFuture(responseData)
             }
         } catch {
             return httpClient.eventLoopGroup.next().makeFailedFuture(error)
