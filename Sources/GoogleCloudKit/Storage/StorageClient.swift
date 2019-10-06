@@ -17,9 +17,10 @@ public final class GoogleCloudStorageClient {
     public var objectAccessControl: ObjectAccessControlsAPI
     public var notifications: StorageNotificationsAPI
     public var object: StorageObjectAPI
-
+    private var client: HTTPClient
+    
     public init(configuration: GoogleCloudCredentialsConfiguration, storageConfig: GoogleCloudStorageConfiguration, eventLoop: EventLoop) throws {
-        let client = HTTPClient(eventLoopGroupProvider: .shared(eventLoop),
+        client = HTTPClient(eventLoopGroupProvider: .shared(eventLoop),
                                 configuration: HTTPClient.Configuration(ignoreUncleanSSLShutdown: true))
         // A token implementing OAuthRefreshable. Loaded from credentials from the provider config.
         let refreshableToken = try OAuthCredentialLoader.getRefreshableToken(credentialFilePath: configuration.serviceAccountCredentialsPath,
@@ -47,5 +48,9 @@ public final class GoogleCloudStorageClient {
         objectAccessControl = GoogleCloudStorageObjectAccessControlsAPI(request: storageRequest)
         notifications = GoogleCloudStorageNotificationsAPI(request: storageRequest)
         object = GoogleCloudStorageObjectAPI(request: storageRequest)
+    }
+    
+    deinit {
+        try? client.syncShutdown()
     }
 }
