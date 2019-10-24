@@ -5,6 +5,7 @@
 //  Created by Andrew Edwards on 4/16/18.
 //
 
+import Core
 import Foundation
 import AsyncHTTPClient
 import NIO

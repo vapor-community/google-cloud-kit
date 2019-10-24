@@ -9,13 +9,13 @@ import Foundation
 import AsyncHTTPClient
 
 /// Loads credentials from `~/.config/gcloud/application_default_credentials.json`
-struct GoogleApplicationDefaultCredentials: Codable {
-    let clientId: String
-    let clientSecret: String
-    let refreshToken: String
-    let type: String
+public struct GoogleApplicationDefaultCredentials: Codable {
+    public let clientId: String
+    public let clientSecret: String
+    public let refreshToken: String
+    public let type: String
     
-    init(fromFilePath path: String) throws {
+    public init(fromFilePath path: String) throws {
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         if let contents = try String(contentsOfFile: path).data(using: .utf8) {
@@ -25,7 +25,7 @@ struct GoogleApplicationDefaultCredentials: Codable {
         }
     }
 
-    init(fromJsonString json: String) throws {
+    public init(fromJsonString json: String) throws {
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         if let data = json.data(using: .utf8) {
@@ -37,19 +37,19 @@ struct GoogleApplicationDefaultCredentials: Codable {
 }
 
 /// Loads credentials from a file specified in the `GOOGLE_APPLICATION_CREDENTIALS` environment variable
-struct GoogleServiceAccountCredentials: Codable {
-    let type: String
-    let projectId: String
-    let privateKeyId: String
-    let privateKey: String
-    let clientEmail: String
-    let clientId: String
-    let authUri: URL
-    let tokenUri: URL
-    let authProviderX509CertUrl: URL
-    let clientX509CertUrl: URL
+public struct GoogleServiceAccountCredentials: Codable {
+    public let type: String
+    public let projectId: String
+    public let privateKeyId: String
+    public let privateKey: String
+    public let clientEmail: String
+    public let clientId: String
+    public let authUri: URL
+    public let tokenUri: URL
+    public let authProviderX509CertUrl: URL
+    public let clientX509CertUrl: URL
     
-    init(fromFilePath path: String) throws {
+    public init(fromFilePath path: String) throws {
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         if let contents = try String(contentsOfFile: path).data(using: .utf8) {
@@ -59,7 +59,7 @@ struct GoogleServiceAccountCredentials: Codable {
         }
     }
     
-    init(fromJsonString json: String) throws {
+    public init(fromJsonString json: String) throws {
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         if let data = json.data(using: .utf8) {

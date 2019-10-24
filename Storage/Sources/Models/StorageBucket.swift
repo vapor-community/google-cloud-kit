@@ -5,6 +5,7 @@
 //  Created by Andrew Edwards on 4/17/18.
 //
 
+import Core
 import Foundation
 
 /// The Buckets resource represents a bucket in Google Cloud Storage. There is a single global namespace shared by all buckets. For more information, see Bucket Name Requirements.

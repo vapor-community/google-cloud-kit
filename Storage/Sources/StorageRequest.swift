@@ -5,6 +5,7 @@
 //  Created by Andrew Edwards on 5/19/18.
 //
 
+import Core
 import Foundation
 import NIO
 import NIOFoundationCompat
@@ -30,7 +31,7 @@ public final class GoogleCloudStorageRequest: GoogleCloudAPIRequest {
         self.responseDecoder.dateDecodingStrategy = .formatted(dateFormatter)
     }
     
-    func send<GCM: GoogleCloudModel>(method: HTTPMethod, headers: HTTPHeaders = [:], path: String, query: String = "", body: HTTPClient.Body = .data(Data())) -> EventLoopFuture<GCM> {
+    public func send<GCM: GoogleCloudModel>(method: HTTPMethod, headers: HTTPHeaders = [:], path: String, query: String = "", body: HTTPClient.Body = .data(Data())) -> EventLoopFuture<GCM> {
         return withToken { token in
             return self._send(method: method, headers: headers, path: path, query: query, body: body, accessToken: token.accessToken).flatMap { response in
                 do {

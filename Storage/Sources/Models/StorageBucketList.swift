@@ -5,6 +5,9 @@
 //  Created by Andrew Edwards on 4/18/18.
 //
 
+import Core
+import Foundation
+
 public struct GoogleCloudStorageBucketList: GoogleCloudModel {
     /// The kind of item this is. For lists of buckets, this is always storage#buckets.
     public var kind: String?

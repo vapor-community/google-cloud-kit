@@ -5,6 +5,8 @@
 //  Created by Andrew Edwards on 4/20/18.
 //
 
+import Core
+
 public struct IAMPolicy: GoogleCloudModel {
     /// The kind of item this is. For policies, this is always storage#policy. This field is ignored on input.
     public var kind: String?

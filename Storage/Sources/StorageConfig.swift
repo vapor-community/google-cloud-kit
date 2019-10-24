@@ -5,6 +5,7 @@
 //  Created by Andrew Edwards on 4/21/18.
 //
 
+import Core
 import Foundation
 
 public struct GoogleCloudStorageConfiguration: GoogleCloudAPIConfiguration {
