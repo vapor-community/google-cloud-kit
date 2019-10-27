@@ -69,6 +69,12 @@ public protocol StorageObjectAPI {
                             contentType: String,
                             queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageObject>
     
+    func createResumableUpload(bucket: String,
+                               data: Data,
+                               name: String,
+                               contentType: String,
+                               queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageObject>
+    
     /// Retrieves a list of objects matching the criteria.
     /// - Parameter bucket: Name of the bucket in which to look for objects.
     /// - Parameter queryParameters: [Optional query parameters](https://cloud.google.com/storage/docs/json_api/v1/list/insert#parameters)
@@ -202,6 +208,18 @@ extension StorageObjectAPI {
                                   name: name,
                                   contentType: contentType,
                                   queryParameters: queryParameters)
+    }
+    
+    public func createResumableUpload(bucket: String,
+                                      data: Data,
+                                      name: String,
+                                      contentType: String,
+                                      queryParameters: [String: String]? = nil) -> EventLoopFuture<GoogleCloudStorageObject> {
+        return createResumableUpload(bucket: bucket,
+                                     data: data,
+                                     name: name,
+                                     contentType: contentType,
+                                     queryParameters: queryParameters)
     }
     
     public func list(bucket: String, queryParameters: [String: String]? = nil) -> EventLoopFuture<StorageObjectList> {
@@ -380,6 +398,26 @@ public final class GoogleCloudStorageObjectAPI: StorageObjectAPI {
         }
                 
         let headers: HTTPHeaders = ["Content-Type": contentType]
+        
+        return request.send(method: .POST, headers: headers, path: "\(uploadEndpoint)/\(bucket)/o", query: queryParams, body: .data(data))
+    }
+    
+    public func createResumableUpload(bucket: String,
+                                      data: Data,
+                                      name: String,
+                                      contentType: String,
+                                      queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageObject> {
+        var queryParams = ""
+        if var queryParameters = queryParameters {
+            queryParameters["name"] = name
+            queryParameters["uploadType"] = "resumable"
+            queryParams = queryParameters.queryParameters
+        } else {
+            queryParams = "uploadType=resumable&name=\(name)"
+        }
+        // per the documentation at https://cloud.google.com/storage/docs/json_api/v1/how-tos/resumable-upload
+        // This is the only required header, assuming there's no metadata in the file
+        let headers: HTTPHeaders = ["Content-Length": "*"]
         
         return request.send(method: .POST, headers: headers, path: "\(uploadEndpoint)/\(bucket)/o", query: queryParams, body: .data(data))
     }
