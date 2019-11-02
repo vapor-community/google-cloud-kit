@@ -55,4 +55,4 @@ export GOOGLE_APPLICATION_CREDENTIALS=[Valid Pasted JSON]
 ```
 
 ### Currently the following API's are implemented and you can follow the setup guides for each specific API to integrate with your Vapor project.
-* [x] Cloud Storage [Setup guide](https://github.com/vapor-community/GoogleCloudKit/tree/master/Sources/GoogleCloudKit/Storage/README.md)
+* [x] Cloud Storage [Setup guide](https://github.com/vapor-community/GoogleCloudKit/tree/master/Storage/Sources/README.md)
