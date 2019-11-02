@@ -8,7 +8,7 @@
 import Foundation
 import XCTest
 
-@testable import GoogleCloudKit
+@testable import Core
 
 final class CredentialTests: XCTestCase {
 //    var checkoutPath: String {

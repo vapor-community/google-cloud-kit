@@ -11,7 +11,7 @@ public protocol GoogleCloudModel: Codable {}
 
 extension Dictionary {
     
-    var queryParameters: String {
+    public var queryParameters: String {
         guard let me = self as? [String: Any] else
         { return "" }
         return query(parameters: me)

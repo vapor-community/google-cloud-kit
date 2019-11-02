@@ -8,8 +8,8 @@
 import Foundation
 
 public struct GoogleCloudCredentialsConfiguration {
-    let serviceAccountCredentialsPath: String
-    let project: String?
+    public let serviceAccountCredentialsPath: String
+    public let project: String?
     
     public init(projectId: String? = nil, credentialsFile: String? = nil) {
         project = projectId

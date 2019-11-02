@@ -12,9 +12,10 @@ import AsyncHTTPClient
 import Foundation
 
 public class OAuthServiceAccount: OAuthRefreshable {
-    let httpClient: HTTPClient
-    let credentials: GoogleServiceAccountCredentials
-    let scope: String
+    public let httpClient: HTTPClient
+    public let credentials: GoogleServiceAccountCredentials
+    public let scope: String
+
     private let decoder = JSONDecoder()
     
     init(credentials: GoogleServiceAccountCredentials, scopes: [GoogleCloudAPIScope], httpClient: HTTPClient) {
