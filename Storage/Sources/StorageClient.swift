@@ -37,6 +37,7 @@ public final class GoogleCloudStorageClient {
         guard let projectId = ProcessInfo.processInfo.environment["PROJECT_ID"] ??
                                 (refreshableToken as? OAuthServiceAccount)?.credentials.projectId ??
                                 storageConfig.project ?? configuration.project else {
+            try? client.syncShutdown()
             throw GoogleCloudStorageError.projectIdMissing
         }
 
