@@ -61,8 +61,6 @@ public class OAuthServiceAccount: OAuthRefreshable {
                                    exp: ExpirationClaim(value: Date().addingTimeInterval(3600)),
                                    iat: IssuedAtClaim(value: Date()))
         let privateKey = try RSAKey.private(pem: credentials.privateKey.data(using: .utf8, allowLossyConversion: true) ?? Data())
-        let jwtData = try JWT(payload: payload).sign(using: .rs256(key: privateKey))
-        
-        return String(data: Data(jwtData), encoding: .utf8) ?? ""
+        return try JWTSigner.rs256(key: privateKey).sign(payload)
     }
 }
