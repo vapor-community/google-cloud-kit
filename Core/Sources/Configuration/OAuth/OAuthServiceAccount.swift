@@ -15,13 +15,15 @@ public class OAuthServiceAccount: OAuthRefreshable {
     public let httpClient: HTTPClient
     public let credentials: GoogleServiceAccountCredentials
     public let scope: String
+    private var eventLoop: EventLoop
 
     private let decoder = JSONDecoder()
     
-    init(credentials: GoogleServiceAccountCredentials, scopes: [GoogleCloudAPIScope], httpClient: HTTPClient) {
+    init(credentials: GoogleServiceAccountCredentials, scopes: [GoogleCloudAPIScope], httpClient: HTTPClient, eventLoop: EventLoop) {
         self.credentials = credentials
         self.scope = scopes.map { $0.value }.joined(separator: " ")
         self.httpClient = httpClient
+        self.eventLoop = eventLoop
         decoder.keyDecodingStrategy = .convertFromSnakeCase
     }
 
@@ -34,23 +36,23 @@ public class OAuthServiceAccount: OAuthRefreshable {
                                         .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")
             let request = try HTTPClient.Request(url: GoogleOAuthTokenUrl, method: .POST, headers: headers, body: body)
             
-            return httpClient.execute(request: request).flatMap { response in
+            return httpClient.execute(request: request, eventLoop: .delegate(on: self.eventLoop)).flatMap { response in
                 
                 guard var byteBuffer = response.body,
                 let responseData = byteBuffer.readData(length: byteBuffer.readableBytes),
                 response.status == .ok else {
-                    return self.httpClient.eventLoopGroup.next().makeFailedFuture(OauthRefreshError.noResponse(response.status))
+                    return self.eventLoop.makeFailedFuture(OauthRefreshError.noResponse(response.status))
                 }
                 
                 do {
-                    return self.httpClient.eventLoopGroup.next().makeSucceededFuture(try self.decoder.decode(OAuthAccessToken.self, from: responseData))
+                    return self.eventLoop.makeSucceededFuture(try self.decoder.decode(OAuthAccessToken.self, from: responseData))
                 } catch {
-                    return self.httpClient.eventLoopGroup.next().makeFailedFuture(error)
+                    return self.eventLoop.makeFailedFuture(error)
                 }
             }
             
         } catch {
-            return httpClient.eventLoopGroup.next().makeFailedFuture(error)
+            return self.eventLoop.makeFailedFuture(error)
         }
     }
 

@@ -15,10 +15,12 @@ public class OAuthApplicationDefault: OAuthRefreshable {
     let httpClient: HTTPClient
     let credentials: GoogleApplicationDefaultCredentials
     private let decoder = JSONDecoder()
+    private let eventLoop: EventLoop
     
-    init(credentials: GoogleApplicationDefaultCredentials, httpClient: HTTPClient) {
+    init(credentials: GoogleApplicationDefaultCredentials, httpClient: HTTPClient, eventLoop: EventLoop) {
         self.credentials = credentials
         self.httpClient = httpClient
+        self.eventLoop = eventLoop
         decoder.keyDecodingStrategy = .convertFromSnakeCase
     }
 
@@ -31,22 +33,22 @@ public class OAuthApplicationDefault: OAuthRefreshable {
             
             let request = try HTTPClient.Request(url: GoogleOAuthTokenUrl, method: .POST, headers: headers, body: body)
             
-            return httpClient.execute(request: request).flatMap { response in
+            return httpClient.execute(request: request, eventLoop: .delegate(on: self.eventLoop)).flatMap { response in
                 
                 guard var byteBuffer = response.body,
                     let responseData = byteBuffer.readData(length: byteBuffer.readableBytes),
                     response.status == .ok else {
-                        return self.httpClient.eventLoopGroup.next().makeFailedFuture(OauthRefreshError.noResponse(response.status))
+                        return self.eventLoop.makeFailedFuture(OauthRefreshError.noResponse(response.status))
                 }
                 
                 do {
-                    return self.httpClient.eventLoopGroup.next().makeSucceededFuture(try self.decoder.decode(OAuthAccessToken.self, from: responseData))
+                    return self.eventLoop.makeSucceededFuture(try self.decoder.decode(OAuthAccessToken.self, from: responseData))
                 } catch {
-                    return self.httpClient.eventLoopGroup.next().makeFailedFuture(error)
+                    return self.eventLoop.makeFailedFuture(error)
                 }
             }
         } catch {
-            return httpClient.eventLoopGroup.next().makeFailedFuture(error)
+            return self.eventLoop.makeFailedFuture(error)
         }
     }
 }

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import NIO
 import AsyncHTTPClient
 
 /// Loads credentials from `~/.config/gcloud/application_default_credentials.json`
@@ -71,28 +72,28 @@ public struct GoogleServiceAccountCredentials: Codable {
 }
 
 public class OAuthCredentialLoader {
-    public static func getRefreshableToken(credentialFilePath: String, withConfig config: GoogleCloudAPIConfiguration, andClient client: HTTPClient) throws -> OAuthRefreshable {
+    public static func getRefreshableToken(credentialFilePath: String, withConfig config: GoogleCloudAPIConfiguration, andClient client: HTTPClient, eventLoop: EventLoop) throws -> OAuthRefreshable {
         
         // Check Service account first.
         if let credentials = try? GoogleServiceAccountCredentials(fromFilePath: credentialFilePath) {
-            return OAuthServiceAccount(credentials: credentials, scopes: config.scope, httpClient: client)
+            return OAuthServiceAccount(credentials: credentials, scopes: config.scope, httpClient: client, eventLoop: eventLoop)
         }
 
         if let credentials = try? GoogleServiceAccountCredentials(fromJsonString: credentialFilePath) {
-            return OAuthServiceAccount(credentials: credentials, scopes: config.scope, httpClient: client)
+            return OAuthServiceAccount(credentials: credentials, scopes: config.scope, httpClient: client, eventLoop: eventLoop)
         }
         
         
         // Check Default application credentials next.
         if let credentials = try? GoogleApplicationDefaultCredentials(fromFilePath: credentialFilePath) {
-            return OAuthApplicationDefault(credentials: credentials, httpClient: client)
+            return OAuthApplicationDefault(credentials: credentials, httpClient: client, eventLoop: eventLoop)
         }
 
         if let credentials = try? GoogleApplicationDefaultCredentials(fromJsonString: credentialFilePath) {
-            return OAuthApplicationDefault(credentials: credentials, httpClient: client)
+            return OAuthApplicationDefault(credentials: credentials, httpClient: client, eventLoop: eventLoop)
         }
 
         // If neither work assume we're on GCP infrastructure.
-        return OAuthComputeEngineAppEngineFlex(serviceAccount: config.serviceAccount, httpClient: client)
+        return OAuthComputeEngineAppEngineFlex(serviceAccount: config.serviceAccount, httpClient: client, eventLoop: eventLoop)
     }
 }

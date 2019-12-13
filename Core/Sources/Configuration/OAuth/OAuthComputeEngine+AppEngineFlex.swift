@@ -16,13 +16,15 @@ public class OAuthComputeEngineAppEngineFlex: OAuthRefreshable {
     let serviceAccount: String
     let httpClient: HTTPClient
     var serviceAccountTokenURL: String {
-      return "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/\(serviceAccount)/token"
+        "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/\(serviceAccount)/token"
     }
     private let decoder = JSONDecoder()
+    private let eventLoop: EventLoop
     
-    init(serviceAccount: String = "default", httpClient: HTTPClient) {
+    init(serviceAccount: String = "default", httpClient: HTTPClient, eventLoop: EventLoop) {
         self.serviceAccount = serviceAccount
         self.httpClient = httpClient
+        self.eventLoop = eventLoop
         decoder.keyDecodingStrategy = .convertFromSnakeCase
     }
     
@@ -31,22 +33,22 @@ public class OAuthComputeEngineAppEngineFlex: OAuthRefreshable {
             let headers: HTTPHeaders = ["Metadata-Flavor": "Google"]
             let request = try HTTPClient.Request(url: serviceAccountTokenURL, method: .GET, headers: headers)
             
-            return httpClient.execute(request: request).flatMap { response in
+            return httpClient.execute(request: request, eventLoop: .delegate(on: self.eventLoop)).flatMap { response in
                 
                 guard var byteBuffer = response.body,
                     let responseData = byteBuffer.readData(length: byteBuffer.readableBytes),
                     response.status == .ok else {
-                        return self.httpClient.eventLoopGroup.next().makeFailedFuture(OauthRefreshError.noResponse(response.status))
+                        return self.eventLoop.makeFailedFuture(OauthRefreshError.noResponse(response.status))
                 }
                 
                 do {
-                    return self.httpClient.eventLoopGroup.next().makeSucceededFuture(try self.decoder.decode(OAuthAccessToken.self, from: responseData))
+                    return self.eventLoop.makeSucceededFuture(try self.decoder.decode(OAuthAccessToken.self, from: responseData))
                 } catch {
-                    return self.httpClient.eventLoopGroup.next().makeFailedFuture(error)
+                    return self.eventLoop.makeFailedFuture(error)
                 }
             }
         } catch {
-            return httpClient.eventLoopGroup.next().makeFailedFuture(error)
+            return self.eventLoop.makeFailedFuture(error)
         }
     }
 }
