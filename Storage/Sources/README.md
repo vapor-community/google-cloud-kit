@@ -23,10 +23,12 @@ let cloudStorageConfiguration = GoogleCloudStorageConfig.default()
 // has full control access and uses default service account with no project specified.
 ```
 
-### Now create a `GoogleCloudStorageClient` with the configuration.
+### Now create a `GoogleCloudStorageClient` with the configuration and an `HTTPClient`
 ```swift
-let gcs = try GoogleCloudStorageClient(configuration: credentialsConfiguration,
+let let client = HTTPClient(...)
+let gcs = try GoogleCloudStorageClient(credentials: credentialsConfiguration,
                                        storageConfiguration: cloudStorageConfiguration,
+                                       httpClient: client,
                                        eventLoop: myEventLoop)
 
 ```
@@ -42,8 +44,9 @@ Initializing the client will throw an error if no projectID is set anywhere.
 
 ```swift
 func createBucket() {
-    let gcs = try GoogleCloudStorageClient(configuration: credentialsConfiguration,
+    let gcs = try GoogleCloudStorageClient(credentials: credentialsConfiguration,
                                            storageConfiguration: cloudStorageConfiguration,
+                                           httpClient: client,
                                            eventLoop: myEventLoop)
 
     gcs.buckets.insert(name: "nio-cloud-storage-demo").flatMap { newBucket in
@@ -56,8 +59,10 @@ func createBucket() {
 
 ```swift
 func uploadImage(data: Data) {
-    let gcs = try GoogleCloudStorageClient(configuration: credentialsConfiguration,
-                                           storageConfiguration: cloudStorageConfiguration)
+    let gcs = try GoogleCloudStorageClient(credentials: credentialsConfiguration,
+                                           storageConfiguration: cloudStorageConfiguration,
+                                           httpClient: client,
+                                           eventLoop: myEventLoop)
 
     gcs.object.createSimpleUpload(bucket: "nio-cloud-storage-demo",
                                   data: data,

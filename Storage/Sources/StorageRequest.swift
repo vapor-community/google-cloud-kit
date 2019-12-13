@@ -20,11 +20,13 @@ public final class GoogleCloudStorageRequest: GoogleCloudAPIRequest {
     public let responseDecoder: JSONDecoder = JSONDecoder()
     public var currentToken: OAuthAccessToken?
     public var tokenCreatedTime: Date?
+    private let eventLoop: EventLoop
     
-    init(httpClient: HTTPClient, oauth: OAuthRefreshable, project: String) {
+    init(httpClient: HTTPClient, eventLoop: EventLoop, oauth: OAuthRefreshable, project: String) {
         self.refreshableToken = oauth
         self.httpClient = httpClient
         self.project = project
+        self.eventLoop = eventLoop
         let dateFormatter = DateFormatter()
 
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
@@ -37,13 +39,13 @@ public final class GoogleCloudStorageRequest: GoogleCloudAPIRequest {
                 do {
                     if GCM.self is GoogleCloudStorgeDataResponse.Type {
                         let model = GoogleCloudStorgeDataResponse(data: response) as! GCM
-                        return self.httpClient.eventLoopGroup.next().makeSucceededFuture(model)
+                        return self.eventLoop.makeSucceededFuture(model)
                     } else {
                         let model = try self.responseDecoder.decode(GCM.self, from: response)
-                        return self.httpClient.eventLoopGroup.next().makeSucceededFuture(model)
+                        return self.eventLoop.makeSucceededFuture(model)
                     }
                 } catch {
-                    return self.httpClient.eventLoopGroup.next().makeFailedFuture(error)
+                    return self.eventLoop.makeFailedFuture(error)
                 }
             }
         }
@@ -57,11 +59,11 @@ public final class GoogleCloudStorageRequest: GoogleCloudAPIRequest {
         do {
             let request = try HTTPClient.Request(url: "\(path)?\(query)", method: method, headers: _headers, body: body)
             
-            return httpClient.execute(request: request).flatMap { response in
+            return httpClient.execute(request: request, eventLoop: .delegate(on: self.eventLoop)).flatMap { response in
                 // If we get a 204 for example in the delete api call just return an empty body to decode.
                 // https://cloud.google.com/s/results/?q=If+successful%2C+this+method+returns+an+empty+response+body.&p=%2Fstorage%2Fdocs%2F
                 if response.status == .noContent {
-                    return self.httpClient.eventLoopGroup.next().makeSucceededFuture("{}".data(using: .utf8)!)
+                    return self.eventLoop.makeSucceededFuture("{}".data(using: .utf8)!)
                 }
 
                 guard var byteBuffer = response.body else {
@@ -78,12 +80,12 @@ public final class GoogleCloudStorageRequest: GoogleCloudAPIRequest {
                         error = CloudStorageAPIError(error: CloudStorageAPIErrorBody(errors: [], code: Int(response.status.code), message: body))
                     }
 
-                    return self.httpClient.eventLoopGroup.next().makeFailedFuture(error)
+                    return self.eventLoop.makeFailedFuture(error)
                 }
-                return self.httpClient.eventLoopGroup.next().makeSucceededFuture(responseData)
+                return self.eventLoop.makeSucceededFuture(responseData)
             }
         } catch {
-            return httpClient.eventLoopGroup.next().makeFailedFuture(error)
+            return self.eventLoop.makeFailedFuture(error)
         }
     }
 }

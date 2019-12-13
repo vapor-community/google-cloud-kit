@@ -18,30 +18,32 @@ public final class GoogleCloudStorageClient {
     public var objectAccessControl: ObjectAccessControlsAPI
     public var notifications: StorageNotificationsAPI
     public var object: StorageObjectAPI
-    private var client: HTTPClient
     
-    public init(configuration: GoogleCloudCredentialsConfiguration, storageConfig: GoogleCloudStorageConfiguration, eventLoop: EventLoop) throws {
-        client = HTTPClient(eventLoopGroupProvider: .shared(eventLoop),
-                                configuration: HTTPClient.Configuration(ignoreUncleanSSLShutdown: true))
-        // A token implementing OAuthRefreshable. Loaded from credentials from the provider config.
-        let refreshableToken = try OAuthCredentialLoader.getRefreshableToken(credentialFilePath: configuration.serviceAccountCredentialsPath,
+    /// Initialize a client for interacting with the Google Cloud Storage API
+    /// - Parameter credentials: The Credentials to use when authenticating with the APIs
+    /// - Parameter storageConfig: The storage configuration for the Cloud Storage API
+    /// - Parameter httpClient: An `HTTPClient` used for making API requests.
+    /// - Parameter eventLoop: The EventLoop used to perform the work on.
+    public init(credentials: GoogleCloudCredentialsConfiguration, storageConfig: GoogleCloudStorageConfiguration, httpClient: HTTPClient, eventLoop: EventLoop) throws {
+        /// A token implementing `OAuthRefreshable`. Loaded from credentials specified by `GoogleCloudCredentialsConfiguration`.
+        let refreshableToken = try OAuthCredentialLoader.getRefreshableToken(credentialFilePath: credentials.serviceAccountCredentialsPath,
                                                                              withConfig: storageConfig,
-                                                                             andClient: client)
+                                                                             andClient: httpClient,
+                                                                             eventLoop: eventLoop)
 
-        // Set the projectId to use for this client. In order of priority:
-        // - Environment Variable (PROJECT_ID)
-        // - Service Account's projectID
-        // - GoogleCloudStorageConfigurations `project` property (optionally configured).
-        // - GoogleCloudCredentialsConfiguration's `project` property (optionally configured).
+        /// Set the projectId to use for this client. In order of priority:
+        /// - Environment Variable (PROJECT_ID)
+        /// - Service Account's projectID
+        /// - `GoogleCloudStorageConfigurations` `project` property (optionally configured).
+        /// - `GoogleCloudCredentialsConfiguration's` `project` property (optionally configured).
         
         guard let projectId = ProcessInfo.processInfo.environment["PROJECT_ID"] ??
                                 (refreshableToken as? OAuthServiceAccount)?.credentials.projectId ??
-                                storageConfig.project ?? configuration.project else {
-            try? client.syncShutdown()
+                                storageConfig.project ?? credentials.project else {
             throw GoogleCloudStorageError.projectIdMissing
         }
 
-        let storageRequest = GoogleCloudStorageRequest(httpClient: client, oauth: refreshableToken, project: projectId)
+        let storageRequest = GoogleCloudStorageRequest(httpClient: httpClient, eventLoop: eventLoop, oauth: refreshableToken, project: projectId)
 
         bucketAccessControl = GoogleCloudStorageBucketAccessControlAPI(request: storageRequest)
         buckets = GoogleCloudStorageBucketAPI(request: storageRequest)
@@ -50,9 +52,5 @@ public final class GoogleCloudStorageClient {
         objectAccessControl = GoogleCloudStorageObjectAccessControlsAPI(request: storageRequest)
         notifications = GoogleCloudStorageNotificationsAPI(request: storageRequest)
         object = GoogleCloudStorageObjectAPI(request: storageRequest)
-    }
-    
-    deinit {
-        try? client.syncShutdown()
     }
 }
