@@ -24,12 +24,15 @@ public final class GoogleCloudStorageClient {
     /// - Parameter storageConfig: The storage configuration for the Cloud Storage API
     /// - Parameter httpClient: An `HTTPClient` used for making API requests.
     /// - Parameter eventLoop: The EventLoop used to perform the work on.
-    public init(credentials: GoogleCloudCredentialsConfiguration, storageConfig: GoogleCloudStorageConfiguration, httpClient: HTTPClient, eventLoop: EventLoop) throws {
+    public init(credentials: GoogleCloudCredentialsConfiguration,
+                storageConfig: GoogleCloudStorageConfiguration,
+                httpClient: HTTPClient,
+                eventLoop: EventLoop) throws {
         /// A token implementing `OAuthRefreshable`. Loaded from credentials specified by `GoogleCloudCredentialsConfiguration`.
-        let refreshableToken = try OAuthCredentialLoader.getRefreshableToken(credentialFilePath: credentials.serviceAccountCredentialsPath,
-                                                                             withConfig: storageConfig,
-                                                                             andClient: httpClient,
-                                                                             eventLoop: eventLoop)
+        let refreshableToken = OAuthCredentialLoader.getRefreshableToken(credentials: credentials,
+                                                                         withConfig: storageConfig,
+                                                                         andClient: httpClient,
+                                                                         eventLoop: eventLoop)
 
         /// Set the projectId to use for this client. In order of priority:
         /// - Environment Variable (PROJECT_ID)
