@@ -8,10 +8,11 @@
 import Foundation
 
 public struct GoogleCloudCredentialsConfiguration {
-    public let serviceAccountCredentialsPath: String
     public let project: String?
+    public var serviceAccountCredentials: GoogleServiceAccountCredentials?
+    public var applicationDefaultCredentials: GoogleApplicationDefaultCredentials?
     
-    public init(projectId: String? = nil, credentialsFile: String? = nil) {
+    public init(projectId: String? = nil, credentialsFile: String? = nil) throws {
         project = projectId
         let env = ProcessInfo.processInfo.environment
         
@@ -21,8 +22,20 @@ public struct GoogleCloudCredentialsConfiguration {
         // - CredentialFile (optionally configured)
         // - Application Default Credentials.
         // https://cloud.google.com/docs/authentication/production#providing_credentials_to_your_application
-        self.serviceAccountCredentialsPath = env["GOOGLE_APPLICATION_CREDENTIALS"] ??
+        let serviceAccountCredentialsPath = env["GOOGLE_APPLICATION_CREDENTIALS"] ??
                                              credentialsFile ??
                                              "~/.config/gcloud/application_default_credentials.json"
+                
+        if let serviceaccount = try? GoogleServiceAccountCredentials(fromFilePath: serviceAccountCredentialsPath) {
+            self.serviceAccountCredentials = serviceaccount
+        } else {
+            self.serviceAccountCredentials = try? GoogleServiceAccountCredentials(fromJsonString: serviceAccountCredentialsPath)
+        }
+        
+        if let defaultcredentials = try? GoogleApplicationDefaultCredentials(fromFilePath: serviceAccountCredentialsPath) {
+            self.applicationDefaultCredentials = defaultcredentials
+        } else {
+            self.applicationDefaultCredentials = try? GoogleApplicationDefaultCredentials(fromJsonString: serviceAccountCredentialsPath)
+        }
     }
 }

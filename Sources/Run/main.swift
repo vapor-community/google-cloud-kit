@@ -12,13 +12,13 @@
 //import AsyncHTTPClient
 //import NIO
 //
-//let credentialsConfiguration = GoogleCloudCredentialsConfiguration()
-//
-//let cloudStorageConfiguration: GoogleCloudStorageConfiguration = .default()
 //let elg = MultiThreadedEventLoopGroup(numberOfThreads: 1)
 //let client = HTTPClient(eventLoopGroupProvider: .shared(elg),
 //                        configuration: .init(ignoreUncleanSSLShutdown: true))
 //do {
+//    let credentialsConfiguration = try GoogleCloudCredentialsConfiguration()
+//
+//    let cloudStorageConfiguration: GoogleCloudStorageConfiguration = .default()
 //    let gcs = try GoogleCloudStorageClient(credentials: credentialsConfiguration,
 //                                            storageConfig: cloudStorageConfiguration,
 //                                            httpClient: client,
@@ -32,3 +32,4 @@
 //} catch {
 //    print(error)
 //}
+//try? client.syncShutdown()
