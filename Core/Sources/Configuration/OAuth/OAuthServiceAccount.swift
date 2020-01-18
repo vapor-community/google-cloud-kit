@@ -20,7 +20,7 @@ public class OAuthServiceAccount: OAuthRefreshable {
 
     private let decoder = JSONDecoder()
     
-    init(credentials: GoogleServiceAccountCredentials, scopes: [GoogleCloudAPIScope], httpClient: HTTPClient, eventLoop: EventLoop, subscription: String? = nil) {
+    init(credentials: GoogleServiceAccountCredentials, scopes: [GoogleCloudAPIScope], subscription: String?, httpClient: HTTPClient, eventLoop: EventLoop) {
         self.credentials = credentials
         self.scope = scopes.map { $0.value }.joined(separator: " ")
         self.httpClient = httpClient
