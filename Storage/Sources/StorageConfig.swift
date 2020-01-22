@@ -12,6 +12,7 @@ public struct GoogleCloudStorageConfiguration: GoogleCloudAPIConfiguration {
     public var scope: [GoogleCloudAPIScope]
     public let serviceAccount: String
     public let project: String?
+    public let subscription: String? = nil
     
     public init(scope: [GoogleCloudStorageScope], serviceAccount: String, project: String?) {
         self.scope = scope

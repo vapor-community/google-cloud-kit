@@ -20,6 +20,8 @@ public struct OAuthPayload: JWTPayload {
     var exp: ExpirationClaim
     /// The time the assertion was issued, specified as seconds since 00:00:00 UTC, January 1, 1970.
     var iat: IssuedAtClaim
+    /// Using to nominate the account you want access to on the domain from a service account
+    var sub: String?
     
     public func verify(using signer: JWTSigner) throws {
         try exp.verifyNotExpired()

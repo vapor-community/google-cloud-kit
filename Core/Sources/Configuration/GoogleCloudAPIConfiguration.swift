@@ -12,6 +12,7 @@ public protocol GoogleCloudAPIConfiguration {
     var scope: [GoogleCloudAPIScope] { get }
     var serviceAccount: String { get }
     var project: String? { get }
+    var subscription: String? { get }
 }
 
 public protocol GoogleCloudAPIScope {
