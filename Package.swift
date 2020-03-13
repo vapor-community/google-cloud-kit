@@ -1,48 +1,57 @@
-// swift-tools-version:5.1
+// swift-tools-version:5.2
 
 import PackageDescription
 
 let package = Package(
-    name: "GoogleCloudKit",
-    platforms: [ .macOS(.v10_14)],
+    name: "google-cloud-kit",
+    platforms: [ .macOS(.v10_15)],
     products: [
          .library(
-             name: "GoogleCloudCore",
+             name: "google-cloud-core",
              targets: ["Core"]
          ),
          .library(
-             name: "GoogleCloudStorage",
+             name: "google-cloud-storage",
              targets: ["Storage"]
          ),
         .library(
-            name: "GoogleCloudKit",
+            name: "google-cloud-kit",
             targets: ["Core", "Storage"]
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-nio.git", from: "2.0.0"),
-        .package(url: "https://github.com/swift-server/async-http-client.git", from: "1.0.0"),
-        .package(url: "https://github.com/vapor/jwt-kit.git", from: "4.0.0-beta")
+        .package(url: "https://github.com/swift-server/async-http-client.git", .exact("1.1.0")),
+        .package(url: "https://github.com/vapor/jwt-kit.git", from: "4.0.0-rc")
     ],
     targets: [
         .target(
             name: "Core",
-            dependencies: ["AsyncHTTPClient", "JWTKit", "NIOFoundationCompat"],
+            dependencies: [
+                .product(name: "JWTKit", package: "jwt-kit"),
+                .product(name: "AsyncHTTPClient", package: "async-http-client"),
+            ],
             path: "Core/Sources/"
         ),
         .target(
             name: "Storage",
-            dependencies: ["Core"],
+            dependencies: [
+                .target(name: "Core")
+            ],
             path: "Storage/Sources/"
         ),
         .testTarget(
             name: "CoreTests",
-            dependencies: ["Core", "AsyncHTTPClient"],
+            dependencies: [
+                .target(name: "Core"),
+                .product(name: "AsyncHTTPClient", package: "async-http-client")
+            ],
             path: "Core/Tests/"
         ),
         .testTarget(
             name: "StorageTests",
-            dependencies: ["Storage"],
+            dependencies: [
+                .target(name: "Storage")
+            ],
             path: "Storage/Tests/"
         ),
     ]

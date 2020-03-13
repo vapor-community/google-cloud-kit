@@ -12,15 +12,15 @@ import NIOFoundationCompat
 import NIOHTTP1
 import AsyncHTTPClient
 
-public final class GoogleCloudStorageRequest: GoogleCloudAPIRequest {
+class GoogleCloudStorageRequest: GoogleCloudAPIRequest {
     
-    public let refreshableToken: OAuthRefreshable
-    public let project: String
-    public let httpClient: HTTPClient
-    public let responseDecoder: JSONDecoder = JSONDecoder()
-    public var currentToken: OAuthAccessToken?
-    public var tokenCreatedTime: Date?
-    private let eventLoop: EventLoop
+    let refreshableToken: OAuthRefreshable
+    let project: String
+    let httpClient: HTTPClient
+    let responseDecoder: JSONDecoder = JSONDecoder()
+    var currentToken: OAuthAccessToken?
+    var tokenCreatedTime: Date?
+    var eventLoop: EventLoop
     
     init(httpClient: HTTPClient, eventLoop: EventLoop, oauth: OAuthRefreshable, project: String) {
         self.refreshableToken = oauth
