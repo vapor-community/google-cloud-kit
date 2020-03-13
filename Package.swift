@@ -7,15 +7,15 @@ let package = Package(
     platforms: [ .macOS(.v10_15)],
     products: [
          .library(
-             name: "google-cloud-core",
+             name: "GoogleCloudCore",
              targets: ["Core"]
          ),
          .library(
-             name: "google-cloud-storage",
+             name: "GoogleCloudStorage",
              targets: ["Storage"]
          ),
         .library(
-            name: "google-cloud-kit",
+            name: "GoogleCloudKit",
             targets: ["Core", "Storage"]
         ),
     ],
