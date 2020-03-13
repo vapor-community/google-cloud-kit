@@ -18,6 +18,7 @@ public final class GoogleCloudStorageClient {
     public var objectAccessControl: ObjectAccessControlsAPI
     public var notifications: StorageNotificationsAPI
     public var object: StorageObjectAPI
+    var storageRequest: GoogleCloudStorageRequest
     
     /// Initialize a client for interacting with the Google Cloud Storage API
     /// - Parameter credentials: The Credentials to use when authenticating with the APIs
@@ -46,7 +47,10 @@ public final class GoogleCloudStorageClient {
             throw GoogleCloudStorageError.projectIdMissing
         }
 
-        let storageRequest = GoogleCloudStorageRequest(httpClient: httpClient, eventLoop: eventLoop, oauth: refreshableToken, project: projectId)
+        storageRequest = GoogleCloudStorageRequest(httpClient: httpClient,
+                                                   eventLoop: eventLoop,
+                                                   oauth: refreshableToken,
+                                                   project: projectId)
 
         bucketAccessControl = GoogleCloudStorageBucketAccessControlAPI(request: storageRequest)
         buckets = GoogleCloudStorageBucketAPI(request: storageRequest)
@@ -55,5 +59,12 @@ public final class GoogleCloudStorageClient {
         objectAccessControl = GoogleCloudStorageObjectAccessControlsAPI(request: storageRequest)
         notifications = GoogleCloudStorageNotificationsAPI(request: storageRequest)
         object = GoogleCloudStorageObjectAPI(request: storageRequest)
+    }
+    
+    /// Hop to a new eventloop to execute requests on.
+    /// - Parameter eventLoop: The eventloop to execute requests on.
+    public func hopped(to eventLoop: EventLoop) -> GoogleCloudStorageClient {
+        storageRequest.eventLoop = eventLoop
+        return self
     }
 }
