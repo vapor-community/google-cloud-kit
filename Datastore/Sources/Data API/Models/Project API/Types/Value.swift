@@ -1,5 +1,4 @@
 import Core
-import Foundation
 
 /// A message that can hold any of the supported value types and associated metadata.
 public struct Value: GoogleCloudModel {

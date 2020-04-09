@@ -1,5 +1,4 @@
 import Core
-import Foundation
 
 /// An array value.
 public struct ArrayValue: GoogleCloudModel {

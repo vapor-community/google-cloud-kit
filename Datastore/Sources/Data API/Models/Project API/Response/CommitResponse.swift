@@ -1,5 +1,4 @@
 import Core
-import Foundation
 
 public struct CommitResponse: GoogleCloudModel {
     /// The number of index entries updated during the commit, or zero if none were updated.

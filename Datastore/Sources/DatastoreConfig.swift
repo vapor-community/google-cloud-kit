@@ -1,12 +1,4 @@
-//
-//  GoogleCloudStorageConfiguration.swift
-//  GoogleCloudKit
-//
-//  Created by Andrew Edwards on 4/21/18.
-//
-
 import Core
-import Foundation
 
 public struct GoogleCloudDatastoreConfiguration: GoogleCloudAPIConfiguration {
     public var scope: [GoogleCloudAPIScope]

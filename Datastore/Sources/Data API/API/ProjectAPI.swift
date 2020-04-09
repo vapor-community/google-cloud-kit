@@ -1,7 +1,5 @@
 import AsyncHTTPClient
-import Core
 import NIO
-import NIOHTTP1
 import Foundation
 
 public protocol DatastoreProjectAPI {

@@ -1,5 +1,4 @@
 import Core
-import Foundation
 
 public enum DatastoreQuery {
     case query(Query)

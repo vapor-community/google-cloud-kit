@@ -1,5 +1,4 @@
 import Core
-import Foundation
 
 public typealias EntityProperties = [String: Value]
 

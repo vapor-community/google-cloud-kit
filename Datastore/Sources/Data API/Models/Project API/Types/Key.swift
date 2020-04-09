@@ -1,5 +1,4 @@
 import Core
-import Foundation
 
 public struct Key: GoogleCloudModel {
     /// Entities are partitioned into subsets, currently identified by a project ID and namespace ID. Queries are scoped to a single partition.

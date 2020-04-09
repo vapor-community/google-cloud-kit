@@ -1,5 +1,4 @@
 import Core
-import Foundation
 
 public struct RunQueryResponse: GoogleCloudModel {
     public init(batch: QueryResultBatch? = nil,

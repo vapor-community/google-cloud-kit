@@ -1,5 +1,4 @@
 import Core
-import Foundation
 
 public struct MutationResult: GoogleCloudModel {
     public init(conflictDetected: Bool, key: Key? = nil, version: String) {

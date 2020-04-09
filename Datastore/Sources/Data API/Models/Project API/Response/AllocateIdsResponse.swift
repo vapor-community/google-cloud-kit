@@ -1,5 +1,4 @@
 import Core
-import Foundation
 
 public struct AllocateIdsResponse: GoogleCloudModel {
     /// The keys specified in the request (in the same order), each with its key path completed with a newly allocated ID.

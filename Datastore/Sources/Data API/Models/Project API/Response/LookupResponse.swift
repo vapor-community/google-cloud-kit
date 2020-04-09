@@ -1,5 +1,4 @@
 import Core
-import Foundation
 
 public struct LookupResponse: GoogleCloudModel {
     public init(deferred: [Key]? = nil, found: [EntityResult]? = nil, missing: [EntityResult]? = nil) {

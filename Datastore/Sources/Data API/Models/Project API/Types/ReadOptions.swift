@@ -1,5 +1,4 @@
 import Core
-import Foundation
 
 public struct ReadOptions: GoogleCloudModel {
     
