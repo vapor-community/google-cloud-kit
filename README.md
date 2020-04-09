@@ -1,6 +1,6 @@
 # GoogleCloudKit
 
-![Swift](http://img.shields.io/badge/swift-5.1-brightgreen.svg)
+![Swift](http://img.shields.io/badge/swift-5.2-brightgreen.svg)
 ![NIO](http://img.shields.io/badge/NIO-2.0-brightgreen.svg)
 
 ## This project aims to bring over as many [Google Cloud Platform APIs](https://cloud.google.com/products/) as possible to server side swift projects built on top of Swift NIO.
@@ -31,7 +31,7 @@ API from your local workstation.
 In your `Package.swift` file, add the following
 
 ```swift
-.package(url: "https://github.com/vapor-community/GoogleCloudKit.git", from: "1.0.0-alpha.1")
+.package(url: "https://github.com/vapor-community/google-cloud-kit.git", from: "1.0.0-alpha.1")
 ```
 Now setup the configuration.
 
@@ -56,3 +56,4 @@ export GOOGLE_APPLICATION_CREDENTIALS=[Valid Pasted JSON]
 
 ### Currently the following API's are implemented and you can follow the setup guides for each specific API to integrate with your project.
 * [x] Cloud Storage [Setup guide](https://github.com/vapor-community/GoogleCloudKit/tree/master/Storage/Sources/README.md)
+* [x] Datastore [Setup guide](https://github.com/vapor-community/GoogleCloudKit/tree/master/Datastore/Sources/README.md)

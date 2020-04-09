@@ -6,17 +6,21 @@ let package = Package(
     name: "google-cloud-kit",
     platforms: [ .macOS(.v10_15)],
     products: [
-         .library(
-             name: "GoogleCloudCore",
-             targets: ["Core"]
-         ),
-         .library(
-             name: "GoogleCloudStorage",
-             targets: ["Storage"]
-         ),
         .library(
             name: "GoogleCloudKit",
-            targets: ["Core", "Storage"]
+            targets: ["Core", "Storage", "Datastore"]
+        ),
+        .library(
+            name: "GoogleCloudCore",
+            targets: ["Core"]
+        ),
+        .library(
+            name: "GoogleCloudStorage",
+            targets: ["Storage"]
+        ),
+        .library(
+            name: "GoogleCloudDatastore",
+            targets: ["Datastore"]
         ),
     ],
     dependencies: [
@@ -39,6 +43,13 @@ let package = Package(
             ],
             path: "Storage/Sources/"
         ),
+        .target(
+            name: "Datastore",
+            dependencies: [
+                .target(name: "Core")
+            ],
+            path: "Datastore/Sources/"
+        ),
         .testTarget(
             name: "CoreTests",
             dependencies: [
@@ -53,6 +64,13 @@ let package = Package(
                 .target(name: "Storage")
             ],
             path: "Storage/Tests/"
+        ),
+        .testTarget(
+            name: "DatastoreTests",
+            dependencies: [
+                .target(name: "Datastore")
+            ],
+            path: "Datastore/Tests/"
         ),
     ]
 )
