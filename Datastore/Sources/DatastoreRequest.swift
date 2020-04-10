@@ -54,7 +54,6 @@ class GoogleCloudDatastoreRequest: GoogleCloudAPIRequest {
             
             return httpClient.execute(request: request, eventLoop: .delegate(on: self.eventLoop)).flatMap { response in
                 // If we get a 204 for example in the delete api call just return an empty body to decode.
-                // https://cloud.google.com/s/results/?q=If+successful%2C+this+method+returns+an+empty+response+body.&p=%2Fstorage%2Fdocs%2F
                 if response.status == .noContent {
                     return self.eventLoop.makeSucceededFuture("{}".data(using: .utf8)!)
                 }

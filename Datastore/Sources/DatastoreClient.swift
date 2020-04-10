@@ -4,7 +4,7 @@ import AsyncHTTPClient
 import NIO
 
 public final class GoogleCloudDatastoreClient {
-
+    
     public var project: DatastoreProjectAPI
     var datastoreRequest: GoogleCloudDatastoreRequest
     
@@ -24,24 +24,24 @@ public final class GoogleCloudDatastoreClient {
                                                                          withConfig: config,
                                                                          andClient: httpClient,
                                                                          eventLoop: eventLoop)
-
+        
         /// Set the projectId to use for this client. In order of priority:
         /// - Environment Variable (PROJECT_ID)
         /// - Service Account's projectID
-        /// - `GoogleCloudStorageConfigurations` `project` property (optionally configured).
+        /// - `GoogleCloudDatastoreConfigurations` `project` property (optionally configured).
         /// - `GoogleCloudCredentialsConfiguration's` `project` property (optionally configured).
         
         guard let projectId = ProcessInfo.processInfo.environment["PROJECT_ID"] ??
-                                (refreshableToken as? OAuthServiceAccount)?.credentials.projectId ??
-                                config.project ?? credentials.project else {
+                              (refreshableToken as? OAuthServiceAccount)?.credentials.projectId ??
+                              config.project ?? credentials.project else {
             throw GoogleCloudDatastoreError.projectIdMissing
         }
-
+        
         datastoreRequest = GoogleCloudDatastoreRequest(httpClient: httpClient,
-                                                   eventLoop: eventLoop,
-                                                   oauth: refreshableToken,
-                                                   project: projectId)
-
+                                                       eventLoop: eventLoop,
+                                                       oauth: refreshableToken,
+                                                       project: projectId)
+        
         project = GoogleCloudDatastoreProjectAPI(request: datastoreRequest, endpoint: base)
     }
     

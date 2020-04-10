@@ -15,7 +15,7 @@ public enum GoogleCloudDatastoreError: GoogleCloudError {
     }
 }
 
-/// [Reference](https://cloud.google.com/storage/docs/json_api/v1/status-codes)
+/// [Reference](https://cloud.google.com/datastore/docs/concepts/errors)
 public struct CloudDatastoreAPIError: GoogleCloudError, GoogleCloudModel {
     /// A container for the error information.
     public var error: CloudDatastoreAPIErrorBody
