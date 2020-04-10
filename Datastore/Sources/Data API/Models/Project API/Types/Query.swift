@@ -27,14 +27,14 @@ public struct Query: GoogleCloudModel {
     public let startCursor: String?
     
     public init(distinctOn: [PropertyReference]? = nil,
-        endCursor: String? = nil,
-        filter: Filter.TypedFilter? = nil,
-        kind: [KindExpression]? = nil,
-        limit: Int? = nil,
-        offset: Int? = nil,
-        order: [PropertyOrder]? = nil,
-        projection: [Projection]? = nil,
-        startCursor: String? = nil) {
+                endCursor: String? = nil,
+                filter: Filter.TypedFilter? = nil,
+                kind: [KindExpression]? = nil,
+                limit: Int? = nil,
+                offset: Int? = nil,
+                order: [PropertyOrder]? = nil,
+                projection: [Projection]? = nil,
+                startCursor: String? = nil) {
         
         switch filter {
         case .composite(let filter):
@@ -56,14 +56,14 @@ public struct Query: GoogleCloudModel {
     }
     
     init(distinctOn: [PropertyReference]? = nil,
-                 endCursor: String? = nil,
-                 filter: Filter? = nil,
-                 kind: [KindExpression]? = nil,
-                 limit: Int? = nil,
-                 offset: Int? = nil,
-                 order: [PropertyOrder]? = nil,
-                 projection: [Projection]? = nil,
-                 startCursor: String? = nil) {
+         endCursor: String? = nil,
+         filter: Filter? = nil,
+         kind: [KindExpression]? = nil,
+         limit: Int? = nil,
+         offset: Int? = nil,
+         order: [PropertyOrder]? = nil,
+         projection: [Projection]? = nil,
+         startCursor: String? = nil) {
         self.distinctOn = distinctOn
         self.endCursor = endCursor
         self.filter = filter
@@ -89,13 +89,13 @@ public struct CompositeFilter: GoogleCloudModel {
         /// The results are required to satisfy each of the combined filters.
         case and = "AND"
     }
-       
+    
     public init(_ filters: [Filter]) {
         self.init(filters: filters, op: .and)
     }
     
     init(filters: [Filter],
-                 op: Operator? = nil) {
+         op: Operator? = nil) {
         self.filters = filters
         self.op = op
     }
@@ -103,7 +103,7 @@ public struct CompositeFilter: GoogleCloudModel {
 
 /// A filter on a specific property.
 public struct PropertyFilter: GoogleCloudModel {
-
+    
     /// The operator to filter by.
     public let op: Operator?
     /// The property to filter by.
@@ -121,8 +121,8 @@ public struct PropertyFilter: GoogleCloudModel {
     }
     
     public init(op: Operator? = nil,
-                 property: PropertyReference? = nil,
-                 value: Value? = nil) {
+                property: PropertyReference? = nil,
+                value: Value? = nil) {
         self.op = op
         self.property = property
         self.value = value
@@ -153,7 +153,7 @@ public struct PropertyOrder: GoogleCloudModel {
     }
     
     public init(direction: Direction = .ascending,
-                 property: PropertyReference) {
+                property: PropertyReference) {
         self.direction = direction
         self.property = property
     }
@@ -204,7 +204,7 @@ public struct Filter: GoogleCloudModel {
     }
     
     init(compositeFilter: CompositeFilter? = nil,
-                 propertyFilter: PropertyFilter? = nil) {
+         propertyFilter: PropertyFilter? = nil) {
         self.compositeFilter = compositeFilter
         self.propertyFilter = propertyFilter
     }
@@ -249,12 +249,12 @@ public struct QueryResultBatch: GoogleCloudModel {
     }
     
     public init(endCursor: String? = nil,
-                 entityResultType: ResultType? = nil,
-                 entityResults: [EntityResult]? = nil,
-                 moreResults: MoreResultsType? = nil,
-                 skippedCursor: String? = nil,
-                 skippedResults: Int? = nil,
-                 snapshotVersion: String? = nil) {
+                entityResultType: ResultType? = nil,
+                entityResults: [EntityResult]? = nil,
+                moreResults: MoreResultsType? = nil,
+                skippedCursor: String? = nil,
+                skippedResults: Int? = nil,
+                snapshotVersion: String? = nil) {
         self.endCursor = endCursor
         self.entityResultType = entityResultType
         self.entityResults = entityResults
@@ -280,9 +280,9 @@ public struct GqlQuery: GoogleCloudModel {
     public let queryString: String?
     
     public init(allowLiterals: Bool? = nil,
-                 namedBindings: GqlQueryNamedBindings? = nil,
-                 positionalBindings: [GqlQueryParameter]? = nil,
-                 queryString: String? = nil) {
+                namedBindings: GqlQueryNamedBindings? = nil,
+                positionalBindings: [GqlQueryParameter]? = nil,
+                queryString: String? = nil) {
         self.allowLiterals = allowLiterals
         self.namedBindings = namedBindings
         self.positionalBindings = positionalBindings
@@ -314,7 +314,7 @@ public struct GqlQueryParameter: GoogleCloudModel {
     }
     
     init(cursor: String? = nil,
-                 value: Value? = nil) {
+         value: Value? = nil) {
         self.cursor = cursor
         self.value = value
     }

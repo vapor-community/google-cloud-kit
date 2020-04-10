@@ -8,9 +8,9 @@ public final class GoogleCloudDatastoreClient {
     public var project: DatastoreProjectAPI
     var datastoreRequest: GoogleCloudDatastoreRequest
     
-    /// Initialize a client for interacting with the Google Cloud Storage API
+    /// Initialize a client for interacting with the Google Cloud Datastore API
     /// - Parameter credentials: The Credentials to use when authenticating with the APIs
-    /// - Parameter storageConfig: The storage configuration for the Cloud Storage API
+    /// - Parameter config: The configuration for the Cloud Datastore API
     /// - Parameter httpClient: An `HTTPClient` used for making API requests.
     /// - Parameter eventLoop: The EventLoop used to perform the work on.
     /// - Parameter base: The base URL to use for the Datastore API

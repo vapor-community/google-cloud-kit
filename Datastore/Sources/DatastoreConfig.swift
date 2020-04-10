@@ -15,8 +15,8 @@ public struct GoogleCloudDatastoreConfiguration: GoogleCloudAPIConfiguration {
     /// Create a new `GoogleCloudDatastoreConfiguration` with datastore scope and the default service account.
     public static func `default`() -> GoogleCloudDatastoreConfiguration {
         return GoogleCloudDatastoreConfiguration(scope: [.datastore],
-                                               serviceAccount: "default",
-                                               project: nil)
+                                                 serviceAccount: "default",
+                                                 project: nil)
     }
 }
 
@@ -28,8 +28,8 @@ public enum GoogleCloudDatastoreScope: GoogleCloudAPIScope {
     
     public var value: String {
         switch self {
-            case .datastore: return "https://www.googleapis.com/auth/datastore"
-            case .cloudPlatform: return "https://www.googleapis.com/auth/cloud-platform"
+        case .datastore: return "https://www.googleapis.com/auth/datastore"
+        case .cloudPlatform: return "https://www.googleapis.com/auth/cloud-platform"
         }
     }
 }

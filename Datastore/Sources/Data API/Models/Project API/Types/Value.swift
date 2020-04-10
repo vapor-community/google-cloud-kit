@@ -74,20 +74,20 @@ public struct Value: GoogleCloudModel {
             self.init(timestampValue: value, excludeFromIndexes: excludeFromIndexes, meaning: meaning); return
         }
     }
-        
+    
     init(arrayValue: ArrayValue? = nil,
-                 blobValue: String? = nil,
-                 booleanValue: Bool? = nil,
-                 doubleValue: Double? = nil,
-                 entityValue: Entity? = nil,
-                 geoPointValue: LatLng? = nil,
-                 integerValue: String? = nil,
-                 keyValue: Key? = nil,
-                 nullValue: String? = nil,
-                 stringValue: String? = nil,
-                 timestampValue: String? = nil,
-                 excludeFromIndexes: Bool? = nil,
-                 meaning: Int? = nil) {
+         blobValue: String? = nil,
+         booleanValue: Bool? = nil,
+         doubleValue: Double? = nil,
+         entityValue: Entity? = nil,
+         geoPointValue: LatLng? = nil,
+         integerValue: String? = nil,
+         keyValue: Key? = nil,
+         nullValue: String? = nil,
+         stringValue: String? = nil,
+         timestampValue: String? = nil,
+         excludeFromIndexes: Bool? = nil,
+         meaning: Int? = nil) {
         self.arrayValue = arrayValue
         self.blobValue = blobValue
         self.booleanValue = booleanValue
