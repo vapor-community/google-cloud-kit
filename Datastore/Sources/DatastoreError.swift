@@ -23,11 +23,24 @@ public struct CloudDatastoreAPIError: GoogleCloudError, GoogleCloudModel {
 
 public struct CloudDatastoreAPIErrorBody: Codable {
     /// A container for the error details.
-    public var errors: [CloudDatastoreError]
+    public var status: Status
     /// An HTTP status code value, without the textual description.
     public var code: Int
     /// Description of the error. Same as `errors.message`.
     public var message: String
+    
+    public enum Status: String, RawRepresentable, Codable {
+        case unknownError
+        case alreadyExists = "ALREADY_EXISTS"
+        case deadlineExceeded = "DEADLINE_EXCEEDED"
+        case failedPrecondition = "FAILED_PRECONDITION"
+        case internalError = "INTERNAL"
+        case notFound = "NOT_FOUND"
+        case permissionDenied = "PERMISSION_DENIED"
+        case resourceExhausted = "RESOURCE_EXHAUSTED"
+        case unauthenticated = "UNAUTHENTICATED"
+        case unavailable = "UNAVAILABLE"
+    }
 }
 
 public struct CloudDatastoreError: Codable {

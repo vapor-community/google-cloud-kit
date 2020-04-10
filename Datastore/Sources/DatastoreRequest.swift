@@ -69,7 +69,7 @@ class GoogleCloudDatastoreRequest: GoogleCloudAPIRequest {
                         error = jsonError
                     } else {
                         let body = response.body?.getString(at: response.body?.readerIndex ?? 0, length: response.body?.readableBytes ?? 0) ?? ""
-                        error = CloudDatastoreAPIError(error: CloudDatastoreAPIErrorBody(errors: [], code: Int(response.status.code), message: body))
+                        error = CloudDatastoreAPIError(error: CloudDatastoreAPIErrorBody(status: .unknownError, code: Int(response.status.code), message: body))
                     }
 
                     return self.eventLoop.makeFailedFuture(error)
