@@ -160,7 +160,7 @@ public final class GoogleCloudStorageObjectAccessControlsAPI: ObjectAccessContro
             let requestBody = try JSONSerialization.data(withJSONObject: body)
             return request.send(method: .POST, path: "\(endpoint)/\(bucket)/o/\(object)/acl", query: queryParams, body: .data(requestBody))
         } catch {
-            return request.httpClient.eventLoopGroup.next().makeFailedFuture(error)
+            return request.eventLoop.makeFailedFuture(error)
         }
     }
     
@@ -187,7 +187,7 @@ public final class GoogleCloudStorageObjectAccessControlsAPI: ObjectAccessContro
             let requestBody = try JSONSerialization.data(withJSONObject: objectACL)
             return request.send(method: .PATCH, path: "\(endpoint)/\(bucket)/o/\(object)/acl/\(entity)", query: queryParams, body: .data(requestBody))
         } catch {
-            return request.httpClient.eventLoopGroup.next().makeFailedFuture(error)
+            return request.eventLoop.makeFailedFuture(error)
         }
     }
     
@@ -205,7 +205,7 @@ public final class GoogleCloudStorageObjectAccessControlsAPI: ObjectAccessContro
             let requestBody = try JSONSerialization.data(withJSONObject: objectACL)
             return request.send(method: .PUT, path: "\(endpoint)/\(bucket)/o/\(object)/acl/\(entity)", query: queryParams, body: .data(requestBody))
         } catch {
-            return request.httpClient.eventLoopGroup.next().makeFailedFuture(error)
+            return request.eventLoop.makeFailedFuture(error)
         }
     }
 }

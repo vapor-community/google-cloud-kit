@@ -111,7 +111,7 @@ public final class GoogleCloudStorageBucketAccessControlAPI: BucketAccessControl
             let requestBody = try JSONSerialization.data(withJSONObject: body)
             return request.send(method: .POST, path: "\(endpoint)/\(bucket)/acl", query: queryParams, body: .data(requestBody))
         } catch {
-            return request.httpClient.eventLoopGroup.next().makeFailedFuture(error)
+            return request.eventLoop.makeFailedFuture(error)
         }
     }
     
@@ -147,7 +147,7 @@ public final class GoogleCloudStorageBucketAccessControlAPI: BucketAccessControl
             let requestBody = try JSONSerialization.data(withJSONObject: body)
             return request.send(method: .POST, path: "\(endpoint)/\(bucket)/acl/\(entity)", query: queryParams, body: .data(requestBody))
         } catch {
-            return request.httpClient.eventLoopGroup.next().makeFailedFuture(error)
+            return request.eventLoop.makeFailedFuture(error)
         }
     }
 }

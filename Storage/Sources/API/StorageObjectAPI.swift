@@ -312,7 +312,7 @@ public final class GoogleCloudStorageObjectAPI: StorageObjectAPI {
             let requestBody = try JSONSerialization.data(withJSONObject: body)
             return request.send(method: .POST, path: "\(endpoint)/\(bucket)/o/\(destinationObject)/compose", query: queryParams, body: .data(requestBody))
         } catch {
-            return request.httpClient.eventLoopGroup.next().makeFailedFuture(error)
+            return request.eventLoop.makeFailedFuture(error)
         }
     }
     
@@ -331,7 +331,7 @@ public final class GoogleCloudStorageObjectAPI: StorageObjectAPI {
             let requestBody = try JSONSerialization.data(withJSONObject: object)
             return request.send(method: .POST, path: "\(endpoint)/\(sourceBucket)/o/\(sourceObject)/copyTo/b/\(destinationBucket)/o/\(destinationObject)", query: queryParams, body: .data(requestBody))
         } catch {
-            return request.httpClient.eventLoopGroup.next().makeFailedFuture(error)
+            return request.eventLoop.makeFailedFuture(error)
         }
     }
     
@@ -406,7 +406,7 @@ public final class GoogleCloudStorageObjectAPI: StorageObjectAPI {
             let requestBody = try JSONSerialization.data(withJSONObject: metadata)
             return request.send(method: .PATCH, path: "\(endpoint)/\(bucket)/o)", query: queryParams, body: .data(requestBody))
         } catch {
-            return request.httpClient.eventLoopGroup.next().makeFailedFuture(error)
+            return request.eventLoop.makeFailedFuture(error)
         }
     }
     
@@ -428,7 +428,7 @@ public final class GoogleCloudStorageObjectAPI: StorageObjectAPI {
                                 query: queryParams,
                                 body: .data(requestBody))
         } catch {
-            return request.httpClient.eventLoopGroup.next().makeFailedFuture(error)
+            return request.eventLoop.makeFailedFuture(error)
         }
     }
     
@@ -487,7 +487,7 @@ public final class GoogleCloudStorageObjectAPI: StorageObjectAPI {
             let requestBody = try JSONSerialization.data(withJSONObject: body)
             return request.send(method: .PUT, path: "\(endpoint)/\(bucket)/o/\(object)", query: queryParams, body: .data(requestBody))
         } catch {
-            return request.httpClient.eventLoopGroup.next().makeFailedFuture(error)
+            return request.eventLoop.makeFailedFuture(error)
         }
     }
     public func watchAll(bucket: String,
@@ -534,7 +534,7 @@ public final class GoogleCloudStorageObjectAPI: StorageObjectAPI {
             let requestBody = try JSONSerialization.data(withJSONObject: body)
             return request.send(method: .POST, path: "\(endpoint)/\(bucket)/o/watch", query: queryParams, body: .data(requestBody))
         } catch {
-            return request.httpClient.eventLoopGroup.next().makeFailedFuture(error)
+            return request.eventLoop.makeFailedFuture(error)
         }
     }
 }
