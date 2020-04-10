@@ -431,7 +431,7 @@ public final class GoogleCloudStorageBucketAPI: StorageBucketAPI {
             let requestBody = try JSONSerialization.data(withJSONObject: body)
             return request.send(method: .POST, path: endpoint, query: query, body: .data(requestBody))
         } catch {
-            return request.httpClient.eventLoopGroup.next().makeFailedFuture(error)
+            return request.eventLoop.makeFailedFuture(error)
         }
     }
     
@@ -546,7 +546,7 @@ public final class GoogleCloudStorageBucketAPI: StorageBucketAPI {
             let requestBody = try JSONSerialization.data(withJSONObject: body)
             return request.send(method: .PATCH, path: endpoint, query: query, body: .data(requestBody))
         } catch {
-            return request.httpClient.eventLoopGroup.next().makeFailedFuture(error)
+            return request.eventLoop.makeFailedFuture(error)
         }
     }
 
@@ -571,7 +571,7 @@ public final class GoogleCloudStorageBucketAPI: StorageBucketAPI {
             let requestBody = try JSONSerialization.data(withJSONObject: body)
             return request.send(method: .PUT, path: "\(endpoint)/\(bucket)/iam", query: query, body: .data(requestBody))
         } catch {
-            return request.httpClient.eventLoopGroup.next().makeFailedFuture(error)
+            return request.eventLoop.makeFailedFuture(error)
         }
     }
     
@@ -674,7 +674,7 @@ public final class GoogleCloudStorageBucketAPI: StorageBucketAPI {
             let requestBody = try JSONSerialization.data(withJSONObject: body)
             return request.send(method: .PUT, path: "\(endpoint)/\(bucket)", query: query, body: .data(requestBody))
         } catch {
-            return request.httpClient.eventLoopGroup.next().makeFailedFuture(error)
+            return request.eventLoop.makeFailedFuture(error)
         }
     }
 }

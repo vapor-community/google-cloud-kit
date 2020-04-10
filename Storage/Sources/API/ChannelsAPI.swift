@@ -43,7 +43,7 @@ public final class GoogleCloudStorageChannelsAPI: ChannelsAPI {
             let requestBody = try JSONSerialization.data(withJSONObject: body)
             return request.send(method: .POST, path: "\(endpoint)/stop)", query: queryParams, body: .data(requestBody))
         } catch {
-            return request.httpClient.eventLoopGroup.next().makeFailedFuture(error)
+            return request.eventLoop.makeFailedFuture(error)
         }
     }
 }

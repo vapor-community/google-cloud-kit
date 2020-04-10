@@ -133,7 +133,7 @@ public final class GoogleCloudStorageNotificationsAPI: StorageNotificationsAPI {
             let requestBody = try JSONSerialization.data(withJSONObject: body)
             return request.send(method: .POST, path: "\(endpoint)/\(bucket)/notificationConfigs", query: queryParams, body: .data(requestBody))
         } catch {
-            return request.httpClient.eventLoopGroup.next().makeFailedFuture(error)
+            return request.eventLoop.makeFailedFuture(error)
         }
     }
     
