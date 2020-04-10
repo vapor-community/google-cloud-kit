@@ -95,7 +95,7 @@ public final class GoogleCloudDatastoreProjectAPI: DatastoreProjectAPI {
             let body = try HTTPClient.Body.data(encoder.encode(allocateIdsRequest))
             return request.send(method: .POST, path: "\(projectPath):allocateIds", body: body)
         } catch {
-            return request.httpClient.eventLoopGroup.next().makeFailedFuture(error)
+            return request.eventLoop.makeFailedFuture(error)
         }
     }
     
@@ -107,7 +107,7 @@ public final class GoogleCloudDatastoreProjectAPI: DatastoreProjectAPI {
             let body = try HTTPClient.Body.data(encoder.encode(reserveIdsRequest))
             return request.send(method: .POST, path: "\(projectPath):reserveIds", body: body)
         } catch {
-            return request.httpClient.eventLoopGroup.next().makeFailedFuture(error)
+            return request.eventLoop.makeFailedFuture(error)
         }
     }
     
@@ -117,7 +117,7 @@ public final class GoogleCloudDatastoreProjectAPI: DatastoreProjectAPI {
             let body = try HTTPClient.Body.data(encoder.encode(transactionOptions))
             return request.send(method: .POST, path: "\(projectPath):beginTransaction", body: body)
         } catch {
-            return request.httpClient.eventLoopGroup.next().makeFailedFuture(error)
+            return request.eventLoop.makeFailedFuture(error)
         }
     }
     
@@ -128,7 +128,7 @@ public final class GoogleCloudDatastoreProjectAPI: DatastoreProjectAPI {
             let body = try HTTPClient.Body.data(encoder.encode(commitRequest))
             return request.send(method: .POST, path: "\(projectPath):commit", body: body)
         } catch {
-            return request.httpClient.eventLoopGroup.next().makeFailedFuture(error)
+            return request.eventLoop.makeFailedFuture(error)
         }
     }
 
@@ -140,7 +140,7 @@ public final class GoogleCloudDatastoreProjectAPI: DatastoreProjectAPI {
             let body = try HTTPClient.Body.data(encoder.encode(lookupRequest))
             return request.send(method: .POST, path: "\(projectPath):lookup", body: body)
         } catch {
-            return request.httpClient.eventLoopGroup.next().makeFailedFuture(error)
+            return request.eventLoop.makeFailedFuture(error)
         }
     }
     
@@ -151,7 +151,7 @@ public final class GoogleCloudDatastoreProjectAPI: DatastoreProjectAPI {
             let body = try HTTPClient.Body.data(encoder.encode(rollbackRequest))
             return request.send(method: .POST, path: "\(projectPath):rollback", body: body)
         } catch {
-            return request.httpClient.eventLoopGroup.next().makeFailedFuture(error)
+            return request.eventLoop.makeFailedFuture(error)
         }
     }
     
@@ -170,7 +170,7 @@ public final class GoogleCloudDatastoreProjectAPI: DatastoreProjectAPI {
             let body = try HTTPClient.Body.data(encoder.encode(runQueryRequest))
             return request.send(method: .POST, path: "\(projectPath):runQuery", body: body)
         } catch {
-            return request.httpClient.eventLoopGroup.next().makeFailedFuture(error)
+            return request.eventLoop.makeFailedFuture(error)
         }
     }
 }
