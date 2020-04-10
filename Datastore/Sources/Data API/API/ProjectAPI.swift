@@ -51,7 +51,7 @@ extension DatastoreProjectAPI {
         return reserveIDs(databaseId: databaseId, keys: keys)
     }
     
-    public func beginTransaction(transactionOptions: TransactionOptions) -> EventLoopFuture<BeginTransactionResponse> {
+    public func beginTransaction(transactionOptions: TransactionOptions = .init()) -> EventLoopFuture<BeginTransactionResponse> {
         return beginTransaction(transactionOptions: transactionOptions)
     }
     
@@ -111,7 +111,7 @@ public final class GoogleCloudDatastoreProjectAPI: DatastoreProjectAPI {
         }
     }
     
-    public func beginTransaction(transactionOptions: TransactionOptions) -> EventLoopFuture<BeginTransactionResponse> {
+    public func beginTransaction(transactionOptions: TransactionOptions = .init()) -> EventLoopFuture<BeginTransactionResponse> {
 
         do {
             let body = try HTTPClient.Body.data(encoder.encode(transactionOptions))
