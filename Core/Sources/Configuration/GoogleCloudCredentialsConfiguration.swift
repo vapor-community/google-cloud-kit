@@ -24,7 +24,7 @@ public struct GoogleCloudCredentialsConfiguration {
         // https://cloud.google.com/docs/authentication/production#providing_credentials_to_your_application
         let serviceAccountCredentialsPath = env["GOOGLE_APPLICATION_CREDENTIALS"] ??
                                              credentialsFile ??
-                                             "~/.config/gcloud/application_default_credentials.json"
+                                             "\(NSHomeDirectory())/.config/gcloud/application_default_credentials.json"
                 
         if let serviceaccount = try? GoogleServiceAccountCredentials(fromFilePath: serviceAccountCredentialsPath) {
             self.serviceAccountCredentials = serviceaccount
