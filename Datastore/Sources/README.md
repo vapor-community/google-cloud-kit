@@ -57,7 +57,7 @@ func createEntity() {
    let entity = Entity(key: key, properties: properties)
    let insert = CommitRequest.Mutation(.insert(entity))
 
-    datastore.project.commit(mode: .transactional, mutations: [insert], transactionId: "myTransactionId").map { response in
+    datastore.project.commit(mutations: [insert]).map { response in
         print(response.indexUpdates) // prints 1
     }
 }

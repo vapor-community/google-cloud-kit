@@ -20,10 +20,9 @@ public protocol DatastoreProjectAPI {
        
     /// Commits a transaction, optionally creating, deleting or modifying some entities.
     /// - Parameters:
-    ///   - mode: The type of commit to perform. Defaults to TRANSACTIONAL.
+    ///   - mode: The type of commit to perform.
     ///   - mutations: The mutations to perform.
-    ///   - transactionId: The identifier of the transaction associated with the commit. A transaction identifier is returned by a call to beginTransaction(transactionOptions:).
-    func commit(mode: CommitRequest.Mode, mutations: [CommitRequest.Mutation], transactionId: String) -> EventLoopFuture<CommitResponse>
+    func commit(mode: CommitRequest.Mode, mutations: [CommitRequest.Mutation]) -> EventLoopFuture<CommitResponse>
     
     /// Looks up entities by key.
     /// - Parameter keys: Keys of entities to look up.
@@ -55,8 +54,8 @@ extension DatastoreProjectAPI {
         return beginTransaction(transactionOptions: transactionOptions)
     }
     
-    public func commit(mode: CommitRequest.Mode = .transactional, mutations: [CommitRequest.Mutation], transactionId: String) -> EventLoopFuture<CommitResponse> {
-        return commit(mode: mode, mutations: mutations, transactionId: transactionId)
+    public func commit(mode: CommitRequest.Mode = .nonTransactional, mutations: [CommitRequest.Mutation]) -> EventLoopFuture<CommitResponse> {
+        return commit(mode: mode, mutations: mutations)
     }
     
     public func lookup(keys: [Key]) -> EventLoopFuture<LookupResponse> {
@@ -121,9 +120,9 @@ public final class GoogleCloudDatastoreProjectAPI: DatastoreProjectAPI {
         }
     }
     
-    public func commit(mode: CommitRequest.Mode = .transactional, mutations: [CommitRequest.Mutation], transactionId: String) -> EventLoopFuture<CommitResponse> {
+    public func commit(mode: CommitRequest.Mode = .nonTransactional, mutations: [CommitRequest.Mutation]) -> EventLoopFuture<CommitResponse> {
         do {
-            let commitRequest = CommitRequest(mode: mode, mutations: mutations, transaction: transactionId)
+            let commitRequest = CommitRequest(mode: mode, mutations: mutations)
             
             let body = try HTTPClient.Body.data(encoder.encode(commitRequest))
             return request.send(method: .POST, path: "\(projectPath):commit", body: body)
