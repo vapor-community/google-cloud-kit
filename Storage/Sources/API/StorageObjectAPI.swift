@@ -390,7 +390,7 @@ public final class GoogleCloudStorageObjectAPI: StorageObjectAPI {
             queryParams = queryParameters.queryParameters
         }
         
-        return request.send(method: .GET, path: "\(endpoint)/\(bucket)/o)", query: queryParams)
+        return request.send(method: .GET, path: "\(endpoint)/\(bucket)/o", query: queryParams)
     }
     
     public func patch(bucket: String,
@@ -404,7 +404,7 @@ public final class GoogleCloudStorageObjectAPI: StorageObjectAPI {
         
         do {
             let requestBody = try JSONSerialization.data(withJSONObject: metadata)
-            return request.send(method: .PATCH, path: "\(endpoint)/\(bucket)/o)", query: queryParams, body: .data(requestBody))
+            return request.send(method: .PATCH, path: "\(endpoint)/\(bucket)/o", query: queryParams, body: .data(requestBody))
         } catch {
             return request.eventLoop.makeFailedFuture(error)
         }
