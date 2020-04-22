@@ -13,7 +13,7 @@ To use the Datastore API you can create a `GoogleCloudDatastoreConfiguration` in
 
 ```swift
 let credentialsConfiguration = GoogleCloudCredentialsConfiguration(project: "my-project-1",
-                                                                   credentialsFile: "~/path/to/service-account.json")
+                                                                   credentialsFile: "/path/to/service-account.json")
 
 let clouddatastoreConfiguration = GoogleCloudDatastoreConfiguration(scope: [.datastore],
                                                                 serviceAccount: "default",

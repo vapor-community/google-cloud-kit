@@ -38,7 +38,7 @@ Now setup the configuration.
 ```swift
  import GoogleCloudKit
  
- let credentialsConfig = GoogleCloudCredentialsConfiguration(project: "myprojectid-12345", credentialsFile: "~/path/to/service-account.json")
+ let credentialsConfig = GoogleCloudCredentialsConfiguration(project: "myprojectid-12345", credentialsFile: "/path/to/service-account.json")
 ```
 
 Optionally, you can register an empty `GoogleCloudCredentialsConfiguration()` and configure the following environment variables:

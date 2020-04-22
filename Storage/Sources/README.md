@@ -13,7 +13,7 @@ To use the CloudStorage API you can create a `GoogleCloudStorageConfiguration` i
 
 ```swift
 let credentialsConfiguration = GoogleCloudCredentialsConfiguration(project: "my-project-1",
-                                                                   credentialsFile: "~/path/to/service-account.json")
+                                                                   credentialsFile: "/path/to/service-account.json")
 
 let cloudStorageConfiguration = GoogleCloudStorageConfiguration(scope: [.fullControl, .cloudPlatformReadOnly],
                                                                 serviceAccount: "default",
