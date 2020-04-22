@@ -38,6 +38,47 @@ public protocol DatastoreProjectAPI {
     ///   - readOptions: The options for this query.
     ///   - datastoreQuery: A query to run, either of normal or GQL type
     func runQuery(partitionId: PartitionId, readOptions: ReadOptions?, datastoreQuery: DatastoreQuery) -> EventLoopFuture<RunQueryResponse>
+    
+    
+    /// Inserts an entity
+    /// Convenience method equivalent to calling `commit(mode:mutations:)` with a single insert mutation
+    /// - Parameter entity: The entity to insert
+    func insert(_ entity: Entity) -> EventLoopFuture<CommitResponse>
+    
+    /// Inserts multiple entities
+    /// Convenience method equivalent to calling `commit(mode:mutations:)` with multiple insert mutations
+    /// - Parameter entity: The entities to insert
+    func insert(_ entities: [Entity]) -> EventLoopFuture<CommitResponse>
+    
+    /// Updates an entity
+    /// Convenience method equivalent to calling `commit(mode:mutations:)` with a single update mutation
+    /// - Parameter entity: The entities to update
+    func update(_ entity: Entity) -> EventLoopFuture<CommitResponse>
+    
+    /// Updates multiple entities
+    /// Convenience method equivalent to calling `commit(mode:mutations:)` with multiple update mutations
+    /// - Parameter entity: The entities to update
+    func update(_ entities: [Entity]) -> EventLoopFuture<CommitResponse>
+    
+    /// Upserts (update-or-insert) an entity
+    /// Convenience method equivalent to calling `commit(mode:mutations:)` with a single upsert mutation
+    /// - Parameter entity: The entity to upsert
+    func upsert(_ entity: Entity) -> EventLoopFuture<CommitResponse>
+    
+    /// Upserts multiple entities
+    /// Convenience method equivalent to calling `commit(mode:mutations:)` with multiple upsert mutations
+    /// - Parameter entity: The entities to upsert
+    func upsert(_ entities: [Entity]) -> EventLoopFuture<CommitResponse>
+    
+    /// Deletes an entity
+    /// Convenience method equivalent to calling `commit(mode:mutations:)` with a single delete mutation
+    /// - Parameter key: The key of the entity to delete
+    func delete(_ key: Key) -> EventLoopFuture<CommitResponse>
+    
+    /// Deletes mutiple entities
+    /// Convenience method equivalent to calling `commit(mode:mutations:)` with multiple delete mutations
+    /// - Parameter key: The keys of the entities to delete
+    func delete(_ keys: [Key]) -> EventLoopFuture<CommitResponse>
 }
 
 extension DatastoreProjectAPI {
@@ -68,6 +109,38 @@ extension DatastoreProjectAPI {
    
     public func runQuery(partitionId: PartitionId, readOptions: ReadOptions? = nil, datastoreQuery: DatastoreQuery) -> EventLoopFuture<RunQueryResponse> {
         return runQuery(partitionId: partitionId, readOptions: readOptions, datastoreQuery: datastoreQuery)
+    }
+    
+    public func insert(_ entity: Entity) -> EventLoopFuture<CommitResponse> {
+        return insert([entity])
+    }
+    
+    public func insert(_ entities: [Entity]) -> EventLoopFuture<CommitResponse> {
+        return insert(entities)
+    }
+    
+    public func update(_ entity: Entity) -> EventLoopFuture<CommitResponse> {
+        return update(entity)
+    }
+    
+    public func update(_ entities: [Entity]) -> EventLoopFuture<CommitResponse> {
+        return update(entities)
+    }
+    
+    public func upsert(_ entity: Entity) -> EventLoopFuture<CommitResponse> {
+        return upsert(entity)
+    }
+    
+    public func upsert(_ entities: [Entity]) -> EventLoopFuture<CommitResponse> {
+        return upsert(entities)
+    }
+    
+    public func delete(_ key: Key) -> EventLoopFuture<CommitResponse> {
+        return delete(key)
+    }
+    
+    public func delete(_ keys: [Key]) -> EventLoopFuture<CommitResponse> {
+        return delete(keys)
     }
 }
 
@@ -171,5 +244,41 @@ public final class GoogleCloudDatastoreProjectAPI: DatastoreProjectAPI {
         } catch {
             return request.eventLoop.makeFailedFuture(error)
         }
+    }
+    
+    public func insert(_ entity: Entity) -> EventLoopFuture<CommitResponse> {
+        return insert([entity])
+    }
+    
+    public func insert(_ entities: [Entity]) -> EventLoopFuture<CommitResponse> {
+        let mutations = entities.map { CommitRequest.Mutation(.insert($0)) }
+        return commit(mutations: mutations)
+    }
+    
+    public func update(_ entity: Entity) -> EventLoopFuture<CommitResponse> {
+        return update([entity])
+    }
+    
+    public func update(_ entities: [Entity]) -> EventLoopFuture<CommitResponse> {
+        let mutations = entities.map { CommitRequest.Mutation(.update($0)) }
+        return commit(mutations: mutations)
+    }
+    
+    public func upsert(_ entity: Entity) -> EventLoopFuture<CommitResponse> {
+        return upsert([entity])
+    }
+    
+    public func upsert(_ entities: [Entity]) -> EventLoopFuture<CommitResponse> {
+        let mutations = entities.map { CommitRequest.Mutation(.upsert($0)) }
+        return commit(mutations: mutations)
+    }
+    
+    public func delete(_ key: Key) -> EventLoopFuture<CommitResponse> {
+        return delete([key])
+    }
+    
+    public func delete(_ keys: [Key]) -> EventLoopFuture<CommitResponse> {
+        let mutations = keys.map { CommitRequest.Mutation(.delete($0)) }
+        return commit(mutations: mutations)
     }
 }
