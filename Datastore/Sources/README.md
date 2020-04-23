@@ -55,9 +55,8 @@ func createEntity() {
                                            
    let properties: [String: Value] = ["myKey": Value(.string("myValue"))]
    let entity = Entity(key: key, properties: properties)
-   let insert = CommitRequest.Mutation(.insert(entity))
 
-    datastore.project.commit(mutations: [insert]).map { response in
+    datastore.project.insert(entity).map { response in
         print(response.indexUpdates) // prints 1
     }
 }
