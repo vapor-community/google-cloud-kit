@@ -55,7 +55,7 @@ public protocol StorageObjectAPI {
     /// - Parameter bucket: Name of the bucket in which the object resides.
     /// - Parameter object: Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     /// - Parameter queryParameters: [Optional query parameters](https://cloud.google.com/storage/docs/json_api/v1/objects/get#parameters)
-    func getMedia(bucket: String, object: String, queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorgeDataResponse>
+    func getMedia(bucket: String, object: String, headers: HTTPHeaders, queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorgeDataResponse>
     
     /// Stores a new object with no metadata.
     /// - Parameter bucket: Name of the bucket in which to store the new object. Overrides the provided object metadata's bucket value, if any.
@@ -188,8 +188,8 @@ extension StorageObjectAPI {
         return get(bucket: bucket, object: object, queryParameters: queryParameters)
     }
     
-    public func getMedia(bucket: String, object: String, queryParameters: [String: String]? = nil) -> EventLoopFuture<GoogleCloudStorgeDataResponse> {
-        return getMedia(bucket: bucket, object: object, queryParameters: queryParameters)
+    public func getMedia(bucket: String, object: String, headers: HTTPHeaders = [:], queryParameters: [String: String]? = nil) -> EventLoopFuture<GoogleCloudStorgeDataResponse> {
+        return getMedia(bucket: bucket, object: object, headers: headers, queryParameters: queryParameters)
     }
     
     public func createSimpleUpload(bucket: String,
@@ -353,7 +353,7 @@ public final class GoogleCloudStorageObjectAPI: StorageObjectAPI {
         return request.send(method: .GET, path: "\(endpoint)/\(bucket)/o/\(object)", query: queryParams)
     }
 
-    public func getMedia(bucket: String, object: String, queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorgeDataResponse> {
+    public func getMedia(bucket: String, object: String, headers: HTTPHeaders, queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorgeDataResponse> {
         var queryParams = ""
         if var queryParameters = queryParameters {
             queryParameters["alt"] = "media"
@@ -362,7 +362,7 @@ public final class GoogleCloudStorageObjectAPI: StorageObjectAPI {
             queryParams = "alt=media"
         }
 
-        return request.send(method: .GET, path: "\(endpoint)/\(bucket)/o/\(object)", query: queryParams)
+        return request.send(method: .GET, headers: headers, path: "\(endpoint)/\(bucket)/o/\(object)", query: queryParams)
     }
     
     public func createSimpleUpload(bucket: String,
