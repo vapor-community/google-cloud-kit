@@ -20,9 +20,9 @@ public struct GoogleCloudStorageObject: GoogleCloudModel {
     /// The name of the bucket containing this object.
     public var bucket: String?
     /// The content generation of this object. Used for object versioning.
-    public var generation: String?
+    public var generation: Int?
     /// The version of the metadata for this object at this generation. Used for preconditions and for detecting changes in metadata. A metageneration number is only meaningful in the context of a particular generation of a particular object.
-    public var metageneration: String?
+    public var metageneration: Int?
     /// Content-Type of the object data. If an object is stored without a Content-Type, it is served as application/octet-stream.
     public var contentType: String?
     /// The creation time of the object in RFC 3339 format.
@@ -36,7 +36,7 @@ public struct GoogleCloudStorageObject: GoogleCloudModel {
     /// The time at which the object's storage class was last changed. When the object is initially created, it will be set to timeCreated.
     public var timeStorageClassUpdated: Date?
     /// Content-Length of the data in bytes.
-    public var size: String?
+    public var size: UInt?
     /// MD5 hash of the data; encoded using base64.
     public var md5Hash: String?
     /// Media download link.
@@ -58,7 +58,7 @@ public struct GoogleCloudStorageObject: GoogleCloudModel {
     /// CRC32c checksum, as described in RFC 4960, Appendix B; encoded using base64 in big-endian byte order.
     public var crc32c: String?
     /// Number of underlying components that make up this object. Components are accumulated by compose operations and are limited to a count of 1024, counting 1 for each non-composite component object and componentCount for each composite component object. Note: componentCount is included in the metadata for composite objects only.
-    public var componentCount: String?
+    public var componentCount: Int?
     /// HTTP 1.1 Entity tag for the object.
     public var etag: String?
     /// Metadata of customer-supplied encryption key, if the object is encrypted by such a key.
@@ -71,15 +71,15 @@ public struct GoogleCloudStorageObject: GoogleCloudModel {
                 selfLink: String? = nil,
                 name: String? = nil,
                 bucket: String? = nil,
-                generation: String? = nil,
-                metageneration: String? = nil,
+                generation: Int? = nil,
+                metageneration: Int? = nil,
                 contentType: String? = nil,
                 timeCreated: Date? = nil,
                 updated: Date? = nil,
                 timeDeleted: Date? = nil,
                 storageClass: String? = nil,
                 timeStorageClassUpdated: Date? = nil,
-                size: String? = nil,
+                size: UInt? = nil,
                 md5Hash: String? = nil,
                 mediaLink: String? = nil,
                 contentEncoding: String? = nil,
@@ -90,7 +90,7 @@ public struct GoogleCloudStorageObject: GoogleCloudModel {
                 acl: [ObjectAccessControls]? = nil,
                 owner: Owner? = nil,
                 crc32c: String? = nil,
-                componentCount: String? = nil,
+                componentCount: Int? = nil,
                 etag: String? = nil,
                 customerEncryption: CustomerEncryption? = nil,
                 kmsKeyName: String? = nil) {
