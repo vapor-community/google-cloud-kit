@@ -363,10 +363,10 @@ public final class GoogleCloudStorageObjectAPI: StorageObjectAPI {
             queryParams = "alt=media"
         }
 
-        var header: HTTPHeaders = [:]
+        var headers: HTTPHeaders = [:]
         
         if let range = range {
-            header.add(name: "Range", value: "bytes=\(range.lowerBound)-\(range.upperBound)")
+            headers.add(name: "Range", value: "bytes=\(range.lowerBound)-\(range.upperBound)")
         }
         
         return request.send(method: .GET, headers: headers, path: "\(endpoint)/\(bucket)/o/\(object)", query: queryParams)
