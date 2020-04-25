@@ -37,13 +37,13 @@ public struct GoogleCloudStorageBucket: GoogleCloudModel {
     /// The bucket's logging configuration, which defines the destination bucket and optional name prefix for the current bucket's logs.
     public var logging: Logging?
     /// The metadata generation of this bucket.
-    public var metageneration: Int?
+    public var metageneration: String?
     /// The name of the bucket.
     public var name: String?
     /// The owner of the bucket. This is always the project team's owner group.
     public var owner: Owner?
     /// The project number of the project the bucket belongs to.
-    public var projectNumber: UInt?
+    public var projectNumber: String?
     /// The URI of this bucket.
     public var selfLink: String?
     /// The bucket's retention policy, which defines the minimum age an object in the bucket must reach before it can be deleted or overwritten.
@@ -221,11 +221,11 @@ public struct ObjectAccessControls: GoogleCloudModel {
 
 public struct ProjectTeam: GoogleCloudModel {
     /// The project number.
-    public var projectNumber: UInt?
+    public var projectNumber: String?
     /// The team. Acceptable values are: "editors", "owners", "viewers"
     public var team: String?
     
-    public init(projectNumber: UInt? = nil,
+    public init(projectNumber: String? = nil,
                 team: String? = nil) {
         self.projectNumber = projectNumber
         self.team = team
@@ -385,7 +385,7 @@ public struct RetentionPolicy: GoogleCloudModel {
     /// Whether or not the retentionPolicy is locked. If true, the retentionPolicy cannot be removed and the retention period cannot be reduced.
     public var isLocked: Bool?
     /// The period of time, in seconds, that objects in the bucket must be retained and cannot be deleted, overwritten, or archived. The value must be greater than 0 seconds and less than 3,155,760,000 seconds.
-    public var retentionPeriod: UInt?
+    public var retentionPeriod: Int?
 }
 
 public struct EmptyResponse: GoogleCloudModel {}
