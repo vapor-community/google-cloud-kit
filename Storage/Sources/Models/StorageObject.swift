@@ -20,9 +20,9 @@ public struct GoogleCloudStorageObject: GoogleCloudModel {
     /// The name of the bucket containing this object.
     public var bucket: String?
     /// The content generation of this object. Used for object versioning.
-    public var generation: Int?
+    public var generation: String?
     /// The version of the metadata for this object at this generation. Used for preconditions and for detecting changes in metadata. A metageneration number is only meaningful in the context of a particular generation of a particular object.
-    public var metageneration: Int?
+    public var metageneration: String?
     /// Content-Type of the object data. If an object is stored without a Content-Type, it is served as application/octet-stream.
     public var contentType: String?
     /// The creation time of the object in RFC 3339 format.
@@ -36,7 +36,7 @@ public struct GoogleCloudStorageObject: GoogleCloudModel {
     /// The time at which the object's storage class was last changed. When the object is initially created, it will be set to timeCreated.
     public var timeStorageClassUpdated: Date?
     /// Content-Length of the data in bytes.
-    public var size: UInt?
+    public var size: String?
     /// MD5 hash of the data; encoded using base64.
     public var md5Hash: String?
     /// Media download link.
@@ -71,15 +71,15 @@ public struct GoogleCloudStorageObject: GoogleCloudModel {
                 selfLink: String? = nil,
                 name: String? = nil,
                 bucket: String? = nil,
-                generation: Int? = nil,
-                metageneration: Int? = nil,
+                generation: String? = nil,
+                metageneration: String? = nil,
                 contentType: String? = nil,
                 timeCreated: Date? = nil,
                 updated: Date? = nil,
                 timeDeleted: Date? = nil,
                 storageClass: String? = nil,
                 timeStorageClassUpdated: Date? = nil,
-                size: UInt? = nil,
+                size: String? = nil,
                 md5Hash: String? = nil,
                 mediaLink: String? = nil,
                 contentEncoding: String? = nil,
