@@ -404,7 +404,7 @@ public final class GoogleCloudStorageObjectAPI: StorageObjectAPI {
             queryParams = "uploadType=media&name=\(name)"
         }
         
-        let headers: HTTPHeaders = ["Content-Type": contentType]
+        var headers: HTTPHeaders = ["Content-Type": contentType]
         
         if body.length == nil {
             headers.add(name: "Trasfer-Encoding", value: "chunked")
