@@ -403,8 +403,12 @@ public final class GoogleCloudStorageObjectAPI: StorageObjectAPI {
         } else {
             queryParams = "uploadType=media&name=\(name)"
         }
-                
+        
         let headers: HTTPHeaders = ["Content-Type": contentType]
+        
+        if body.length == nil {
+            headers.add(name: "Trasfer-Encoding", value: "chunked")
+        }
         
         return request.send(method: .POST, headers: headers, path: "\(uploadEndpoint)/\(bucket)/o", query: queryParams, body: body)
     }
