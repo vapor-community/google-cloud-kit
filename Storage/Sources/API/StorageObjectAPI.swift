@@ -7,6 +7,7 @@
 
 import NIO
 import NIOHTTP1
+import AsyncHTTPClient
 import Foundation
 
 public protocol StorageObjectAPI {
