@@ -58,7 +58,7 @@ public struct GoogleCloudStorageObject: GoogleCloudModel {
     /// CRC32c checksum, as described in RFC 4960, Appendix B; encoded using base64 in big-endian byte order.
     public var crc32c: String?
     /// Number of underlying components that make up this object. Components are accumulated by compose operations and are limited to a count of 1024, counting 1 for each non-composite component object and componentCount for each composite component object. Note: componentCount is included in the metadata for composite objects only.
-    public var componentCount: String?
+    public var componentCount: Int?
     /// HTTP 1.1 Entity tag for the object.
     public var etag: String?
     /// Metadata of customer-supplied encryption key, if the object is encrypted by such a key.
@@ -90,7 +90,7 @@ public struct GoogleCloudStorageObject: GoogleCloudModel {
                 acl: [ObjectAccessControls]? = nil,
                 owner: Owner? = nil,
                 crc32c: String? = nil,
-                componentCount: String? = nil,
+                componentCount: Int? = nil,
                 etag: String? = nil,
                 customerEncryption: CustomerEncryption? = nil,
                 kmsKeyName: String? = nil) {
