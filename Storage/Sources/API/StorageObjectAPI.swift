@@ -7,6 +7,7 @@
 
 import NIO
 import NIOHTTP1
+import AsyncHTTPClient
 import Foundation
 
 public protocol StorageObjectAPI {
@@ -57,6 +58,18 @@ public protocol StorageObjectAPI {
     /// - Parameter range: Range of data to download.
     /// - Parameter queryParameters: [Optional query parameters](https://cloud.google.com/storage/docs/json_api/v1/objects/get#parameters)
     func getMedia(bucket: String, object: String, range: ClosedRange<Int>?, queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorgeDataResponse>
+    
+    /// Stores a new object with no metadata.
+    /// - Parameter bucket: Name of the bucket in which to store the new object. Overrides the provided object metadata's bucket value, if any.
+    /// - Parameter body: The content to be uploaded to a bucket.
+    /// - Parameter name: The name of the object. Required if not specified by URL parameter.
+    /// - Parameter contentType: Content-Type of the object data. If an object is stored without a Content-Type, it is served as application/octet-stream.
+    /// - Parameter queryParameters: [Optional query parameters](https://cloud.google.com/storage/docs/json_api/v1/objects/insert#parameters)
+    func createSimpleUpload(bucket: String,
+                            body: HTTPClient.Body,
+                            name: String,
+                            contentType: String,
+                            queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageObject>
     
     /// Stores a new object with no metadata.
     /// - Parameter bucket: Name of the bucket in which to store the new object. Overrides the provided object metadata's bucket value, if any.
@@ -194,12 +207,24 @@ extension StorageObjectAPI {
     }
     
     public func createSimpleUpload(bucket: String,
+                                   body: HTTPClient.Body,
+                                   name: String,
+                                   contentType: String,
+                                   queryParameters: [String: String]? = nil) -> EventLoopFuture<GoogleCloudStorageObject> {
+        return createSimpleUpload(bucket: bucket,
+                                  body: body,
+                                  name: name,
+                                  contentType: contentType,
+                                  queryParameters: queryParameters)
+    }
+    
+    public func createSimpleUpload(bucket: String,
                                    data: Data,
                                    name: String,
                                    contentType: String,
                                    queryParameters: [String: String]? = nil) -> EventLoopFuture<GoogleCloudStorageObject> {
         return createSimpleUpload(bucket: bucket,
-                                  data: data,
+                                  body: .data(data),
                                   name: name,
                                   contentType: contentType,
                                   queryParameters: queryParameters)
@@ -373,7 +398,7 @@ public final class GoogleCloudStorageObjectAPI: StorageObjectAPI {
     }
     
     public func createSimpleUpload(bucket: String,
-                                   data: Data,
+                                   body: HTTPClient.Body,
                                    name: String,
                                    contentType: String,
                                    queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageObject> {
@@ -385,10 +410,14 @@ public final class GoogleCloudStorageObjectAPI: StorageObjectAPI {
         } else {
             queryParams = "uploadType=media&name=\(name)"
         }
-                
-        let headers: HTTPHeaders = ["Content-Type": contentType]
         
-        return request.send(method: .POST, headers: headers, path: "\(uploadEndpoint)/\(bucket)/o", query: queryParams, body: .data(data))
+        var headers: HTTPHeaders = ["Content-Type": contentType]
+        
+        if body.length == nil {
+            headers.add(name: "Transfer-Encoding", value: "chunked")
+        }
+        
+        return request.send(method: .POST, headers: headers, path: "\(uploadEndpoint)/\(bucket)/o", query: queryParams, body: body)
     }
     
     public func list(bucket: String, queryParameters: [String: String]?) -> EventLoopFuture<StorageObjectList> {
