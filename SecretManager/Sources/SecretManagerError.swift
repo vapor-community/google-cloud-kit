@@ -30,7 +30,15 @@ public struct SecretManagerAPIErrorBody: Codable {
     
     public enum Status: String, RawRepresentable, Codable {
         case unknownError
+        case alreadyExists = "ALREADY_EXISTS"
+        case deadlineExceeded = "DEADLINE_EXCEEDED"
+        case failedPrecondition = "FAILED_PRECONDITION"
+        case internalError = "INTERNAL"
         case notFound = "NOT_FOUND"
+        case permissionDenied = "PERMISSION_DENIED"
+        case resourceExhausted = "RESOURCE_EXHAUSTED"
+        case unauthenticated = "UNAUTHENTICATED"
+        case unavailable = "UNAVAILABLE"
     }
 }
 
