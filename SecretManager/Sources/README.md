@@ -9,13 +9,13 @@ you can configure each API with their own configuration if the default `GoogleCl
 
 For example the `GoogleCloudCredentialsConfiguration` can be configured with a `ProjectID`, but you might
 want to use this specific API with a different project than other APIs. Additionally every API has their own scope and you might want to configure.
-To use the Datastore API you can create a `GoogleCloudDatastoreConfiguration` in one of 2 ways.
+To use the Secret Manager API you can create a `GoogleCloudSecretManagerConfiguration` in one of 2 ways.
 
 ```swift
 let credentialsConfiguration = GoogleCloudCredentialsConfiguration(project: "my-project-1",
                                                                    credentialsFile: "/path/to/service-account.json")
 
-let secretManagerConfiguration = GoogleCloudSecretManagerConfiguration(scope: [.datastore],
+let secretManagerConfiguration = GoogleCloudSecretManagerConfiguration(scope: [.cloudPlatform],
                                                                 serviceAccount: "default",
                                                                 project: "my-project-2")
 // OR
@@ -27,7 +27,7 @@ let secretManagerConfiguration = GoogleCloudSecretManagerConfig.default()
 ```swift
 let let client = HTTPClient(...)
 let smc = try GoogleCloudSecretManagerClient(credentials: credentialsConfiguration,
-                                       config: datastoreConfiguration,
+                                       config: secretManagerConfiguration,
                                        httpClient: client,
                                        eventLoop: myEventLoop)
 

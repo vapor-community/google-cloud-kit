@@ -10,7 +10,7 @@ public final class GoogleCloudSecretManagerClient {
     
     /// Initialize a client for interacting with the Google Cloud Secret Manager API
     /// - Parameter credentials: The Credentials to use when authenticating with the APIs
-    /// - Parameter config: The configuration for the Cloud Datastore API
+    /// - Parameter config: The configuration for the Secret Manager API
     /// - Parameter httpClient: An `HTTPClient` used for making API requests.
     /// - Parameter eventLoop: The EventLoop used to perform the work on.
     /// - Parameter base: The base URL to use for the Datastore API
