@@ -8,7 +8,7 @@ let package = Package(
     products: [
         .library(
             name: "GoogleCloudKit",
-            targets: ["Core", "Storage", "Datastore"]
+            targets: ["Core", "Storage", "Datastore", "SecretManager"]
         ),
         .library(
             name: "GoogleCloudCore",
@@ -21,6 +21,10 @@ let package = Package(
         .library(
             name: "GoogleCloudDatastore",
             targets: ["Datastore"]
+        ),
+        .library(
+            name: "GoogleCloudSecretManager",
+            targets: ["SecretManager"]
         ),
     ],
     dependencies: [
@@ -49,6 +53,13 @@ let package = Package(
                 .target(name: "Core")
             ],
             path: "Datastore/Sources/"
+        ),
+        .target(
+            name: "SecretManager",
+            dependencies: [
+                .target(name: "Core")
+            ],
+            path: "SecretManager/Sources"
         ),
         .testTarget(
             name: "CoreTests",
