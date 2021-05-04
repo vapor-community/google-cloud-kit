@@ -26,6 +26,10 @@ let package = Package(
             name: "GoogleCloudSecretManager",
             targets: ["SecretManager"]
         ),
+        .library(
+            name: "GoogleCloudTranslation",
+            targets: ["Translation"]
+        ),
     ],
     dependencies: [
         .package(url: "https://github.com/swift-server/async-http-client.git", from: "1.2.0"),
@@ -61,6 +65,13 @@ let package = Package(
             ],
             path: "SecretManager/Sources"
         ),
+        .target(
+            name: "Translation",
+            dependencies: [
+                .target(name: "Core")
+            ],
+            path: "Translation/Sources"
+        ),
         .testTarget(
             name: "CoreTests",
             dependencies: [
@@ -82,6 +93,13 @@ let package = Package(
                 .target(name: "Datastore")
             ],
             path: "Datastore/Tests/"
+        ),
+        .testTarget(
+            name: "TranslationTests",
+            dependencies: [
+                .target(name: "Translation")
+            ],
+            path: "Translation/Tests/"
         ),
     ]
 )
