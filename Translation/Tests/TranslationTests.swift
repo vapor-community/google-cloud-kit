@@ -22,9 +22,9 @@ class TranslationTests: XCTestCase {
             let translationConfig = GoogleCloudTranslationConfiguration.default()
 
             let gct = try GoogleCloudTranslationClient(credentials: credentialsConfig,
-                                                   config: translationConfig,
-                                                   httpClient: client,
-                                                   eventLoop: elg.next())
+                                                       config: translationConfig,
+                                                       httpClient: client,
+                                                       eventLoop: elg.next())
 
             let translation = gct.translation.translate(text: "Is this working?.", target: "es")
 
