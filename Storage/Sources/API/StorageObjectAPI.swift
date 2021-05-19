@@ -314,6 +314,7 @@ extension StorageObjectAPI {
 public final class GoogleCloudStorageObjectAPI: StorageObjectAPI {
     let endpoint = "https://www.googleapis.com/storage/v1/b"
     let uploadEndpoint = "https://www.googleapis.com/upload/storage/v1/b"
+    let mediaDownloadEndpoint = "https://storage.googleapis.com/"
     let request: GoogleCloudStorageRequest
     
     init(request: GoogleCloudStorageRequest) {
@@ -382,10 +383,7 @@ public final class GoogleCloudStorageObjectAPI: StorageObjectAPI {
     public func getMedia(bucket: String, object: String, range: ClosedRange<Int>?, queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorgeDataResponse> {
         var queryParams = ""
         if var queryParameters = queryParameters {
-            queryParameters["alt"] = "media"
             queryParams = queryParameters.queryParameters
-        } else {
-            queryParams = "alt=media"
         }
 
         var headers: HTTPHeaders = [:]
@@ -394,7 +392,7 @@ public final class GoogleCloudStorageObjectAPI: StorageObjectAPI {
             headers.add(name: "Range", value: "bytes=\(range.lowerBound)-\(range.upperBound)")
         }
         
-        return request.send(method: .GET, headers: headers, path: "\(endpoint)/\(bucket)/o/\(object)", query: queryParams)
+        return request.send(method: .GET, headers: headers, path: "\(mediaDownloadEndpoint)/\(bucket)/\(object)", query: queryParams)
     }
     
     public func createSimpleUpload(bucket: String,
