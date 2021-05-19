@@ -314,7 +314,7 @@ extension StorageObjectAPI {
 public final class GoogleCloudStorageObjectAPI: StorageObjectAPI {
     let endpoint = "https://www.googleapis.com/storage/v1/b"
     let uploadEndpoint = "https://www.googleapis.com/upload/storage/v1/b"
-    let mediaDownloadEndpoint = "https://storage.googleapis.com/"
+    let mediaDownloadEndpoint = "https://storage.googleapis.com"
     let request: GoogleCloudStorageRequest
     
     init(request: GoogleCloudStorageRequest) {
