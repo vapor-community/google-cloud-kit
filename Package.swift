@@ -30,6 +30,10 @@ let package = Package(
             name: "GoogleCloudTranslation",
             targets: ["Translation"]
         ),
+        .library(
+            name: "GoogleCloudPubSub",
+            targets: ["PubSub"]
+        ),
     ],
     dependencies: [
         .package(url: "https://github.com/swift-server/async-http-client.git", from: "1.2.0"),
@@ -72,6 +76,13 @@ let package = Package(
             ],
             path: "Translation/Sources"
         ),
+        .target(
+            name: "PubSub",
+            dependencies: [
+                .target(name: "Core")
+            ],
+            path: "PubSub/Sources"
+        ),
         .testTarget(
             name: "CoreTests",
             dependencies: [
@@ -100,6 +111,13 @@ let package = Package(
                 .target(name: "Translation")
             ],
             path: "Translation/Tests/"
+        ),
+        .testTarget(
+            name: "PubSubTests",
+            dependencies: [
+                .target(name: "PubSub")
+            ],
+            path: "PubSub/Tests/"
         ),
     ]
 )
