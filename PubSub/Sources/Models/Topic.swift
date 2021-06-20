@@ -41,7 +41,7 @@ public struct SchemaSettings: GoogleCloudModel {
     public var encoding: GoogleCloudPubSubEncoding
 }
 
-public enum GoogleCloudPubSubEncoding {
+public enum GoogleCloudPubSubEncoding: String, GoogleCloudModel {
     /// Unspecified
     case unspecified = "ENCODING_UNSPECIFIED"
     
