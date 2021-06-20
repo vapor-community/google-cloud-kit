@@ -4,14 +4,14 @@ import AsyncHTTPClient
 import NIO
 
 public final class GoogleCloudPubSubClient {
-    public var pubSub: PubSubAPI
+    public var pubSubTopic: TopicAPI
     var pubSubRequest: GoogleCloudPubSubRequest
     
     public init(credentials: GoogleCloudCredentialsConfiguration,
                 config: GoogleCloudPubSubConfiguration,
                 httpClient: HTTPClient,
                 eventLoop: EventLoop,
-                base: String = "https://translation.googleapis.com") throws {
+                base: String = "https://pubsub.googleapis.com") throws {
         let refreshableToken = OAuthCredentialLoader.getRefreshableToken(credentials: credentials,
                                                                          withConfig: config,
                                                                          andClient: httpClient,
@@ -26,7 +26,7 @@ public final class GoogleCloudPubSubClient {
                                                  eventLoop: eventLoop,
                                                  oauth: refreshableToken,
                                                  project: projectId)
-        pubSub = GoogleCloudPubSubAPI(request: pubSubRequest, endpoint: base)
+        pubSubTopic = GoogleCloudPubSubTopicAPI(request: pubSubRequest, endpoint: base)
         
     }
     
