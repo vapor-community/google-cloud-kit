@@ -38,10 +38,12 @@ public final class GoogleCloudPubSubTopicAPI: TopicAPI {
     public func publish(topicId: String, data: String, attributes: [String: String]?, orderingKey: String?) -> EventLoopFuture<GoogleCloudPublishResponse> {
         do {
             let message = GoogleCloudPubSubMessage(data: data, attributes: attributes, orderingKey: orderingKey)
-            let body = try HTTPClient.Body.data(encoder.encode(["messages": [message]]))
+            var body: [String: Any] = [:]
+            body["messages"] = [message]
+            let requestBody = try JSONSerialization.data(withJSONObject: body)
             return request.send(method: .POST,
                                 path: "\(endpoint)/v1/projects/\(request.project)/topics/\(topicId)",
-                                body: body)
+                                body: .data(requestBody))
         } catch {
             return request.eventLoop.makeFailedFuture(error)
         }
