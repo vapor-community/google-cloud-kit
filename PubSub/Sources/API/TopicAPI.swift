@@ -6,7 +6,7 @@ import Foundation
 public protocol TopicAPI {
     func get(topicId: String) -> EventLoopFuture<GoogleCloudPubSubTopic>
     func list(pageSize: Int?, pageToken: String?) -> EventLoopFuture<GooglePubSubListTopicResponse>
-    func publish(topicId: String, messages: [Any]) -> EventLoopFuture<GoogleCloudPublishResponse>
+    func publish(topicId: String, data: String, attributes: [String: String]?, orderingKey: String?) -> EventLoopFuture<GoogleCloudPublishResponse>
 }
 
 public final class GoogleCloudPubSubTopicAPI: TopicAPI {
@@ -35,11 +35,14 @@ public final class GoogleCloudPubSubTopicAPI: TopicAPI {
                             query: query)
     }
     
-    public func publish(topicId: String, messages: [Any]) -> EventLoopFuture<GoogleCloudPublishResponse> {
+    public func publish(topicId: String, data: String, attributes: [String: String]?, orderingKey: String?) -> EventLoopFuture<GoogleCloudPublishResponse> {
         do {
-            let body: [String: [Any]] = ["messages": messages]
+            let message = GoogleCloudPubSubMessage(data: data, attributes: attributes, orderingKey: orderingKey)
+            let body: [String: [Any]] = ["messages": [message]]
             let requestBody = try JSONSerialization.data(withJSONObject: body)
-            return request.send(method: .POST, path: "\(endpoint)/v1/projects/\(request.project)/topics/\(topicId)", body: .data(requestBody))
+            return request.send(method: .POST,
+                                path: "\(endpoint)/v1/projects/\(request.project)/topics/\(topicId)",
+                                body: .data(requestBody))
         } catch {
             return request.eventLoop.makeFailedFuture(error)
         }
