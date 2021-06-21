@@ -57,7 +57,7 @@ public final class GoogleCloudPubSubSubscriptionsAPI: SubscriptionsAPI {
                                                              retryPolicy: retryPolicy,
                                                              detached: detached)
             let body = try HTTPClient.Body.data(encoder.encode(subscription))
-            return request.send(method: .POST,
+            return request.send(method: .PUT,
                                 path: "\(endpoint)/v1/projects/\(request.project)/subscriptions/\(subscriptionId)",
                                 body: body)
         } catch {
