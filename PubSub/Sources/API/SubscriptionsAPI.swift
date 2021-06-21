@@ -13,6 +13,7 @@ import Foundation
 public protocol SubscriptionsAPI {
     func get(subscriptionId: String) -> EventLoopFuture<GoogleCloudPubSubSubscription>
     func acknowledge(subscriptionId: String, ackIds: [String]) -> EventLoopFuture<EmptyResponse>
+    func create(subscriptionId: String, topidId: String, pushConfig: PushConfig?, ackDeadlineSeconds: Int?, retainAckedMessages: Bool?, messageRetentionDuration: String?, labels: [String: String]?, enableMessageOrdering: Bool?, expirationPolicy: ExpirationPolicy?, filter: String?, deadLetterPolicy: DeadLetterPolicy?, retryPolicy: RetryPolicy?, detached: Bool?) -> EventLoopFuture<GoogleCloudPubSubSubscription>
 }
 
 public final class GoogleCloudPubSubSubscriptionsAPI: SubscriptionsAPI {
@@ -35,6 +36,29 @@ public final class GoogleCloudPubSubSubscriptionsAPI: SubscriptionsAPI {
             let body = try HTTPClient.Body.data(encoder.encode(acks))
             return request.send(method: .POST,
                                 path: "\(endpoint)/v1/projects/\(request.project)/subscriptions/\(subscriptionId):acknowledge",
+                                body: body)
+        } catch {
+            return request.eventLoop.makeFailedFuture(error)
+        }
+    }
+    
+    public func create(subscriptionId: String, topidId: String, pushConfig: PushConfig?, ackDeadlineSeconds: Int?, retainAckedMessages: Bool?, messageRetentionDuration: String?, labels: [String : String]?, enableMessageOrdering: Bool?, expirationPolicy: ExpirationPolicy?, filter: String?, deadLetterPolicy: DeadLetterPolicy?, retryPolicy: RetryPolicy?, detached: Bool?) -> EventLoopFuture<GoogleCloudPubSubSubscription> {
+        do {
+            let subscription = GoogleCloudPubSubSubscription(name: subscriptionId,
+                                                             topic: topidId,
+                                                             pushConfig: pushConfig,
+                                                             ackDeadlineSeconds: ackDeadlineSeconds,
+                                                             retainAckedMessages: retainAckedMessages,
+                                                             messageRetentionDuration: messageRetentionDuration,
+                                                             labels: labels,
+                                                             enableMessageOrdering: enableMessageOrdering,
+                                                             expirationPolicy: expirationPolicy, filter: filter,
+                                                             deadLetterPolicy: deadLetterPolicy,
+                                                             retryPolicy: retryPolicy,
+                                                             detached: detached)
+            let body = try HTTPClient.Body.data(encoder.encode(subscription))
+            return request.send(method: .POST,
+                                path: "\(endpoint)/v1/projects/\(request.project)/subscriptions/\(subscriptionId)",
                                 body: body)
         } catch {
             return request.eventLoop.makeFailedFuture(error)
