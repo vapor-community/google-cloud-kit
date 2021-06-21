@@ -3,14 +3,14 @@ import NIO
 import AsyncHTTPClient
 import Foundation
 
-public protocol TopicAPI {
+public protocol TopicsAPI {
     func get(topicId: String) -> EventLoopFuture<GoogleCloudPubSubTopic>
     func list(pageSize: Int?, pageToken: String?) -> EventLoopFuture<GooglePubSubListTopicResponse>
     func publish(topicId: String, data: String, attributes: [String: String]?, orderingKey: String?) -> EventLoopFuture<GoogleCloudPublishResponse>
     func getSubscriptionsList(topicId: String, pageSize: Int?, pageToken: String?) -> EventLoopFuture<GooglePubSubTopicSubscriptionListResponse>
 }
 
-public final class GoogleCloudPubSubTopicAPI: TopicAPI {
+public final class GoogleCloudPubSubTopicsAPI: TopicsAPI {
     let endpoint: String
     let request: GoogleCloudPubSubRequest
     let encoder = JSONEncoder()

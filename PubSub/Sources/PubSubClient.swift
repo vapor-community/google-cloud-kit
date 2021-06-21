@@ -4,7 +4,7 @@ import AsyncHTTPClient
 import NIO
 
 public final class GoogleCloudPubSubClient {
-    public var pubSubTopic: TopicAPI
+    public var pubSubTopic: TopicsAPI
     var pubSubRequest: GoogleCloudPubSubRequest
     
     public init(credentials: GoogleCloudCredentialsConfiguration,
@@ -26,7 +26,7 @@ public final class GoogleCloudPubSubClient {
                                                  eventLoop: eventLoop,
                                                  oauth: refreshableToken,
                                                  project: projectId)
-        pubSubTopic = GoogleCloudPubSubTopicAPI(request: pubSubRequest, endpoint: base)
+        pubSubTopic = GoogleCloudPubSubTopicsAPI(request: pubSubRequest, endpoint: base)
         
     }
     
