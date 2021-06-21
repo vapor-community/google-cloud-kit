@@ -78,10 +78,22 @@ public final class GoogleCloudPubSubSubscriptionsAPI: SubscriptionsAPI {
                        retryPolicyMaximumBackoff: String?,
                        detached: Bool?) -> EventLoopFuture<GoogleCloudPubSubSubscription> {
         do {
-            let pushConfig = PushConfig(pushEndpoint: pushEndpoint,
-                                        attributes: pushConfigAttributes,
-                                        oidcToken: OidcToken(serviceAccountEmail: pushConfigOidcTokenServiceAccountEmail, audience: pushConfigOidcTokenAudience))
-            let expirationPolicy = ExpirationPolicy(ttl: expirationPolicyTTL)
+            var pushConfig: PushConfig? = nil
+            if let pushEndpoint = pushEndpoint {
+                var oidcToken: OidcToken? = nil
+                if let serviceAccountEmail = pushConfigOidcTokenServiceAccountEmail, let audience = pushConfigOidcTokenAudience {
+                    oidcToken = OidcToken(serviceAccountEmail: serviceAccountEmail, audience: audience)
+                }
+                
+                pushConfig = PushConfig(pushEndpoint: pushEndpoint,
+                                            attributes: pushConfigAttributes,
+                                            oidcToken: oidcToken)
+            }
+            
+            var expirationPolicy: ExpirationPolicy? = nil
+            if let ttl = expirationPolicyTTL {
+                expirationPolicy = ExpirationPolicy(ttl: ttl)
+            }
             
             var deadLetterPolicy: DeadLetterPolicy? = nil
             if let deadLetterPolicyTopic = deadLetterPolicyTopic {
@@ -89,8 +101,12 @@ public final class GoogleCloudPubSubSubscriptionsAPI: SubscriptionsAPI {
                                                         maxDeliveryAttempts: deadLetterPolicyMaxDeliveryAttempts)
             }
             
-            let retryPolicy = RetryPolicy(minimumBackoff: retryPolicyMinimumBackoff,
-                                          maximumBackoff: retryPolicyMaximumBackoff)
+            var retryPolicy: RetryPolicy? = nil
+            if let min = retryPolicyMinimumBackoff, let max = retryPolicyMaximumBackoff {
+                retryPolicy = RetryPolicy(minimumBackoff: min,
+                                          maximumBackoff: max)
+            }
+            
             let subscription = GoogleCloudPubSubSubscription(name: subscriptionId,
                                                              topic: "projects/\(request.project)/topics/\(topicId)",
                                                              pushConfig: pushConfig,
