@@ -38,7 +38,7 @@ public final class GoogleCloudPubSubTopicAPI: TopicAPI {
     public func publish(topicId: String, data: String, attributes: [String: String]?, orderingKey: String?) -> EventLoopFuture<GoogleCloudPublishResponse> {
         do {
             let message = GoogleCloudPubSubMessage(data: data, attributes: attributes, orderingKey: orderingKey)
-            let body: [String: [Any]] = ["messages": [message]]
+            let body: [String: [GoogleCloudPubSubMessage]] = ["messages": [message]]
             let requestBody = try JSONSerialization.data(withJSONObject: body)
             return request.send(method: .POST,
                                 path: "\(endpoint)/v1/projects/\(request.project)/topics/\(topicId)",
