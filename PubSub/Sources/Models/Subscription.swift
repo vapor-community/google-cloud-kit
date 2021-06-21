@@ -25,23 +25,23 @@ public struct GoogleCloudPubSubSubscription: GoogleCloudModel {
 }
 
 public struct PushConfig: GoogleCloudModel {
-    public var pushEndpoint: String
+    public var pushEndpoint: String?
     public var attributes: [String: String]?
     public var oidcToken: OidcToken?
 }
 
 public struct ExpirationPolicy: GoogleCloudModel {
-    public var ttl: String
+    public var ttl: String?
 }
 
 public struct DeadLetterPolicy: GoogleCloudModel {
-    public var deadLetterTopic: String
-    public var maxDeliveryAttempts: Int
+    public var deadLetterTopic: String?
+    public var maxDeliveryAttempts: Int?
 }
 
 public struct RetryPolicy: GoogleCloudModel {
-    public var minimumBackoff: String
-    public var maximumBackoff: String
+    public var minimumBackoff: String?
+    public var maximumBackoff: String?
 }
 
 public struct OidcToken: GoogleCloudModel {
