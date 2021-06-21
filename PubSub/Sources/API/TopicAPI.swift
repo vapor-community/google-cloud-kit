@@ -7,6 +7,7 @@ public protocol TopicAPI {
     func get(topicId: String) -> EventLoopFuture<GoogleCloudPubSubTopic>
     func list(pageSize: Int?, pageToken: String?) -> EventLoopFuture<GooglePubSubListTopicResponse>
     func publish(topicId: String, data: String, attributes: [String: String]?, orderingKey: String?) -> EventLoopFuture<GoogleCloudPublishResponse>
+    func getSubscriptionsList(topicId: String, pageSize: Int?, pageToken: String?) -> EventLoopFuture<GooglePubSubTopicSubscriptionListResponse>
 }
 
 public final class GoogleCloudPubSubTopicAPI: TopicAPI {
@@ -46,5 +47,16 @@ public final class GoogleCloudPubSubTopicAPI: TopicAPI {
         } catch {
             return request.eventLoop.makeFailedFuture(error)
         }
+    }
+    
+    public func getSubscriptionsList(topicId: String, pageSize: Int?, pageToken: String?) -> EventLoopFuture<GooglePubSubTopicSubscriptionListResponse> {
+        var query = "pageSize=\(pageSize ?? 10)"
+        if let pageToken = pageToken {
+            query.append(contentsOf: "&pageToken=\(pageToken)")
+        }
+        
+        return request.send(method: .GET,
+                            path: "\(endpoint)/v1/projects/\(request.project)/topics/subscriptions",
+                            query: query)
     }
 }
