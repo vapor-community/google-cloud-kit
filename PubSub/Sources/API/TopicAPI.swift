@@ -19,6 +19,6 @@ public final class GoogleCloudPubSubTopicAPI: TopicAPI {
     }
     
     public func get(topic: String) -> EventLoopFuture<GoogleCloudPubSubTopic> {
-        return request.send(method: .GET, path: "\(endpoint)/v1/\(topic)")
+        return request.send(method: .GET, path: "\(endpoint)/v1/projects/\(request.project)/topics/\(topic)")
     }
 }
