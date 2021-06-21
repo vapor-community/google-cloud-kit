@@ -13,7 +13,7 @@ public struct GoogleCloudPubSubTopic: GoogleCloudModel {
     public var name: String
     
     /// See [Creating and managing labels] (https://cloud.google.com/pubsub/docs/labels).
-    public var labels: [String: String]
+    public var labels: [String: String]?
     
     /// A policy constraining the storage of messages published to the topic.
     public var messageStoragePolicy: MessageStoragePolicy
