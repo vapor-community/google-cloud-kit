@@ -25,7 +25,7 @@ class GoogleCloudPubSubRequest: GoogleCloudAPIRequest {
         self.responseDecoder.dateDecodingStrategy = .formatted(dateFormatter)
     }
     
-    public func send<GCM: GoogleCloudModel>(method: HTTPMethod, headers: HTTPHeaders = [:], path: String, query: String = "", body: HTTPClient.Body = .data(Data())) -> EventLoopFuture<GCM> {
+    public func send<GCM: GoogleCloudModel>(method: HTTPMethod, headers: HTTPHeaders = [:], path: String, query: String? = nil, body: HTTPClient.Body = .data(Data())) -> EventLoopFuture<GCM> {
         return withToken { token in
             return self._send(method: method, headers: headers, path: path, query: query, body: body, accessToken: token.accessToken).flatMap { response in
                 do {
@@ -38,13 +38,18 @@ class GoogleCloudPubSubRequest: GoogleCloudAPIRequest {
         }
     }
 
-    private func _send(method: HTTPMethod, headers: HTTPHeaders, path: String, query: String, body: HTTPClient.Body, accessToken: String) -> EventLoopFuture<Data> {
+    private func _send(method: HTTPMethod, headers: HTTPHeaders, path: String, query: String?, body: HTTPClient.Body, accessToken: String) -> EventLoopFuture<Data> {
         var _headers: HTTPHeaders = ["Authorization": "Bearer \(accessToken)",
                                      "Content-Type": "application/json"]
         headers.forEach { _headers.replaceOrAdd(name: $0.name, value: $0.value) }
 
         do {
-            let request = try HTTPClient.Request(url: "\(path)?\(query)", method: method, headers: _headers, body: body)
+            var url = "\(path)"
+            if let query = query {
+                url.append("?\(query)")
+            }
+            
+            let request = try HTTPClient.Request(url: url, method: method, headers: _headers, body: body)
 
             return httpClient.execute(request: request, eventLoop: .delegate(on: self.eventLoop)).flatMap { response in
 
