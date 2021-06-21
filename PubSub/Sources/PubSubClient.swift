@@ -5,6 +5,7 @@ import NIO
 
 public final class GoogleCloudPubSubClient {
     public var pubSubTopic: TopicsAPI
+    public var pubSubSubscription: SubscriptionsAPI
     var pubSubRequest: GoogleCloudPubSubRequest
     
     public init(credentials: GoogleCloudCredentialsConfiguration,
@@ -27,7 +28,7 @@ public final class GoogleCloudPubSubClient {
                                                  oauth: refreshableToken,
                                                  project: projectId)
         pubSubTopic = GoogleCloudPubSubTopicsAPI(request: pubSubRequest, endpoint: base)
-        
+        pubSubSubscription = GoogleCloudPubSubSubscriptionsAPI(request: pubSubRequest, endpoint: base)
     }
     
     /// Hop to a new eventloop to execute requests on.
