@@ -35,7 +35,7 @@ public struct ExpirationPolicy: GoogleCloudModel {
 }
 
 public struct DeadLetterPolicy: GoogleCloudModel {
-    public var deadLetterTopic: String?
+    public var deadLetterTopic: String
     public var maxDeliveryAttempts: Int?
 }
 

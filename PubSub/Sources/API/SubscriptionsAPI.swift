@@ -82,8 +82,13 @@ public final class GoogleCloudPubSubSubscriptionsAPI: SubscriptionsAPI {
                                         attributes: pushConfigAttributes,
                                         oidcToken: OidcToken(serviceAccountEmail: pushConfigOidcTokenServiceAccountEmail, audience: pushConfigOidcTokenAudience))
             let expirationPolicy = ExpirationPolicy(ttl: expirationPolicyTTL)
-            let deadLetterPolicy = DeadLetterPolicy(deadLetterTopic: deadLetterPolicyTopic,
-                                                    maxDeliveryAttempts: deadLetterPolicyMaxDeliveryAttempts)
+            
+            var deadLetterPolicy: DeadLetterPolicy? = nil
+            if let deadLetterPolicyTopic = deadLetterPolicyTopic {
+                deadLetterPolicy = DeadLetterPolicy(deadLetterTopic: deadLetterPolicyTopic,
+                                                        maxDeliveryAttempts: deadLetterPolicyMaxDeliveryAttempts)
+            }
+            
             let retryPolicy = RetryPolicy(minimumBackoff: retryPolicyMinimumBackoff,
                                           maximumBackoff: retryPolicyMaximumBackoff)
             let subscription = GoogleCloudPubSubSubscription(name: subscriptionId,
