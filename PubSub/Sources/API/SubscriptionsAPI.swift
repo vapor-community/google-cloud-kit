@@ -13,7 +13,24 @@ import Foundation
 public protocol SubscriptionsAPI {
     func get(subscriptionId: String) -> EventLoopFuture<GoogleCloudPubSubSubscription>
     func acknowledge(subscriptionId: String, ackIds: [String]) -> EventLoopFuture<EmptyResponse>
-    func create(subscriptionId: String, topicId: String, pushConfig: PushConfig?, ackDeadlineSeconds: Int?, retainAckedMessages: Bool?, messageRetentionDuration: String?, labels: [String: String]?, enableMessageOrdering: Bool?, expirationPolicy: ExpirationPolicy?, filter: String?, deadLetterPolicy: DeadLetterPolicy?, retryPolicy: RetryPolicy?, detached: Bool?) -> EventLoopFuture<GoogleCloudPubSubSubscription>
+    func create(subscriptionId: String,
+                topicId: String,
+                pushEndpoint: String?,
+                pushConfigAttributes: [String: String]?,
+                pushConfigOidcTokenServiceAccountEmail: String?,
+                pushConfigOidcTokenAudience: String?,
+                ackDeadlineSeconds: Int?,
+                retainAckedMessages: Bool?,
+                messageRetentionDuration: String?,
+                labels: [String: String]?,
+                enableMessageOrdering: Bool?,
+                expirationPolicyTTL: String?,
+                filter: String?,
+                deadLetterPolicyTopic: String?,
+                deadLetterPolicyMaxDeliveryAttempts: Int?,
+                retryPolicyMinimumBackoff: String?,
+                retryPolicyMaximumBackoff: String?,
+                detached: Bool?) -> EventLoopFuture<GoogleCloudPubSubSubscription>
 }
 
 public final class GoogleCloudPubSubSubscriptionsAPI: SubscriptionsAPI {
@@ -42,8 +59,33 @@ public final class GoogleCloudPubSubSubscriptionsAPI: SubscriptionsAPI {
         }
     }
     
-    public func create(subscriptionId: String, topicId: String, pushConfig: PushConfig?, ackDeadlineSeconds: Int?, retainAckedMessages: Bool?, messageRetentionDuration: String?, labels: [String : String]?, enableMessageOrdering: Bool?, expirationPolicy: ExpirationPolicy?, filter: String?, deadLetterPolicy: DeadLetterPolicy?, retryPolicy: RetryPolicy?, detached: Bool?) -> EventLoopFuture<GoogleCloudPubSubSubscription> {
+    public func create(subscriptionId: String,
+                       topicId: String,
+                       pushEndpoint: String?,
+                       pushConfigAttributes: [String: String]?,
+                       pushConfigOidcTokenServiceAccountEmail: String?,
+                       pushConfigOidcTokenAudience: String?,
+                       ackDeadlineSeconds: Int?,
+                       retainAckedMessages: Bool?,
+                       messageRetentionDuration: String?,
+                       labels: [String: String]?,
+                       enableMessageOrdering: Bool?,
+                       expirationPolicyTTL: String?,
+                       filter: String?,
+                       deadLetterPolicyTopic: String?,
+                       deadLetterPolicyMaxDeliveryAttempts: Int?,
+                       retryPolicyMinimumBackoff: String?,
+                       retryPolicyMaximumBackoff: String?,
+                       detached: Bool?) -> EventLoopFuture<GoogleCloudPubSubSubscription> {
         do {
+            let pushConfig = PushConfig(pushEndpoint: pushEndpoint,
+                                        attributes: pushConfigAttributes,
+                                        oidcToken: OidcToken(serviceAccountEmail: pushConfigOidcTokenServiceAccountEmail, audience: pushConfigOidcTokenAudience))
+            let expirationPolicy = ExpirationPolicy(ttl: expirationPolicyTTL)
+            let deadLetterPolicy = DeadLetterPolicy(deadLetterTopic: deadLetterPolicyTopic,
+                                                    maxDeliveryAttempts: deadLetterPolicyMaxDeliveryAttempts)
+            let retryPolicy = RetryPolicy(minimumBackoff: retryPolicyMinimumBackoff,
+                                          maximumBackoff: retryPolicyMaximumBackoff)
             let subscription = GoogleCloudPubSubSubscription(name: subscriptionId,
                                                              topic: "projects/\(request.project)/topics/\(topicId)",
                                                              pushConfig: pushConfig,
@@ -52,7 +94,8 @@ public final class GoogleCloudPubSubSubscriptionsAPI: SubscriptionsAPI {
                                                              messageRetentionDuration: messageRetentionDuration,
                                                              labels: labels,
                                                              enableMessageOrdering: enableMessageOrdering,
-                                                             expirationPolicy: expirationPolicy, filter: filter,
+                                                             expirationPolicy: expirationPolicy,
+                                                             filter: filter,
                                                              deadLetterPolicy: deadLetterPolicy,
                                                              retryPolicy: retryPolicy,
                                                              detached: detached)
