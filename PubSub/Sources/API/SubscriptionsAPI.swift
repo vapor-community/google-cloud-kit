@@ -13,7 +13,7 @@ import Foundation
 public protocol SubscriptionsAPI {
     func get(subscriptionId: String) -> EventLoopFuture<GoogleCloudPubSubSubscription>
     func acknowledge(subscriptionId: String, ackIds: [String]) -> EventLoopFuture<EmptyResponse>
-    func create(subscriptionId: String, topidId: String, pushConfig: PushConfig?, ackDeadlineSeconds: Int?, retainAckedMessages: Bool?, messageRetentionDuration: String?, labels: [String: String]?, enableMessageOrdering: Bool?, expirationPolicy: ExpirationPolicy?, filter: String?, deadLetterPolicy: DeadLetterPolicy?, retryPolicy: RetryPolicy?, detached: Bool?) -> EventLoopFuture<GoogleCloudPubSubSubscription>
+    func create(subscriptionId: String, topicId: String, pushConfig: PushConfig?, ackDeadlineSeconds: Int?, retainAckedMessages: Bool?, messageRetentionDuration: String?, labels: [String: String]?, enableMessageOrdering: Bool?, expirationPolicy: ExpirationPolicy?, filter: String?, deadLetterPolicy: DeadLetterPolicy?, retryPolicy: RetryPolicy?, detached: Bool?) -> EventLoopFuture<GoogleCloudPubSubSubscription>
 }
 
 public final class GoogleCloudPubSubSubscriptionsAPI: SubscriptionsAPI {
@@ -42,10 +42,10 @@ public final class GoogleCloudPubSubSubscriptionsAPI: SubscriptionsAPI {
         }
     }
     
-    public func create(subscriptionId: String, topidId: String, pushConfig: PushConfig?, ackDeadlineSeconds: Int?, retainAckedMessages: Bool?, messageRetentionDuration: String?, labels: [String : String]?, enableMessageOrdering: Bool?, expirationPolicy: ExpirationPolicy?, filter: String?, deadLetterPolicy: DeadLetterPolicy?, retryPolicy: RetryPolicy?, detached: Bool?) -> EventLoopFuture<GoogleCloudPubSubSubscription> {
+    public func create(subscriptionId: String, topicId: String, pushConfig: PushConfig?, ackDeadlineSeconds: Int?, retainAckedMessages: Bool?, messageRetentionDuration: String?, labels: [String : String]?, enableMessageOrdering: Bool?, expirationPolicy: ExpirationPolicy?, filter: String?, deadLetterPolicy: DeadLetterPolicy?, retryPolicy: RetryPolicy?, detached: Bool?) -> EventLoopFuture<GoogleCloudPubSubSubscription> {
         do {
             let subscription = GoogleCloudPubSubSubscription(name: subscriptionId,
-                                                             topic: topidId,
+                                                             topic: topicId,
                                                              pushConfig: pushConfig,
                                                              ackDeadlineSeconds: ackDeadlineSeconds,
                                                              retainAckedMessages: retainAckedMessages,
