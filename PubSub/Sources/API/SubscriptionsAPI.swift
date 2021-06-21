@@ -45,7 +45,7 @@ public final class GoogleCloudPubSubSubscriptionsAPI: SubscriptionsAPI {
     public func create(subscriptionId: String, topicId: String, pushConfig: PushConfig?, ackDeadlineSeconds: Int?, retainAckedMessages: Bool?, messageRetentionDuration: String?, labels: [String : String]?, enableMessageOrdering: Bool?, expirationPolicy: ExpirationPolicy?, filter: String?, deadLetterPolicy: DeadLetterPolicy?, retryPolicy: RetryPolicy?, detached: Bool?) -> EventLoopFuture<GoogleCloudPubSubSubscription> {
         do {
             let subscription = GoogleCloudPubSubSubscription(name: subscriptionId,
-                                                             topic: topicId,
+                                                             topic: "projects/\(request.project)/topics/\(topicId)",
                                                              pushConfig: pushConfig,
                                                              ackDeadlineSeconds: ackDeadlineSeconds,
                                                              retainAckedMessages: retainAckedMessages,
