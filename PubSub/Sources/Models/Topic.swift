@@ -16,16 +16,16 @@ public struct GoogleCloudPubSubTopic: GoogleCloudModel {
     public var labels: [String: String]?
     
     /// A policy constraining the storage of messages published to the topic.
-    public var messageStoragePolicy: MessageStoragePolicy
+    public var messageStoragePolicy: MessageStoragePolicy?
     
     /// The resource name of the Cloud KMS CryptoKey to be used to protect access to messages published on this topic. The expected format is `projects/*/locations/*/keyRings/*/cryptoKeys/*`.
-    public var kmsKeyName: String
+    public var kmsKeyName: String?
     
     /// Settings for validating messages published against a schema.
-    public var schemaSettings: SchemaSettings
+    public var schemaSettings: SchemaSettings?
     
     /// Reserved for future use. This field is set only in responses from the server; it is ignored if it is set in any requests.
-    public var satisfiesPzs: Bool
+    public var satisfiesPzs: Bool?
 }
 
 public struct MessageStoragePolicy: GoogleCloudModel {
