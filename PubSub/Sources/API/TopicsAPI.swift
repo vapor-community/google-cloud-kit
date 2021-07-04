@@ -41,8 +41,12 @@ public final class GoogleCloudPubSubTopicsAPI: TopicsAPI {
             let message = GoogleCloudPubSubMessage(data: data, attributes: attributes, orderingKey: orderingKey)
             let publishRequest = GoogleCloudPublishRequest(messages: [message])
             let body = try HTTPClient.Body.data(encoder.encode(publishRequest))
+            let path = "\(endpoint)/v1/projects/\(request.project)/topics/\(topicId):publish"
+            
+            print("<<<--- Publish on: \(path) --->")
+            
             return request.send(method: .POST,
-                                path: "\(endpoint)/v1/projects/\(request.project)/topics/\(topicId):publish",
+                                path: path,
                                 body: body)
         } catch {
             return request.eventLoop.makeFailedFuture(error)

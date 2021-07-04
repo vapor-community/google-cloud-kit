@@ -48,7 +48,7 @@ class GoogleCloudPubSubRequest: GoogleCloudAPIRequest {
             if let query = query {
                 url.append("?\(query)")
             }
-            
+            print("<<<--- Publish on URL: \(url) --->")
             let request = try HTTPClient.Request(url: url, method: method, headers: _headers, body: body)
 
             return httpClient.execute(request: request, eventLoop: .delegate(on: self.eventLoop)).flatMap { response in
