@@ -8,7 +8,7 @@ let package = Package(
     products: [
         .library(
             name: "GoogleCloudKit",
-            targets: ["Core", "Storage", "Datastore", "SecretManager"]
+            targets: ["Core", "Storage", "Datastore", "SecretManager", "PubSub"]
         ),
         .library(
             name: "GoogleCloudCore",
@@ -29,6 +29,10 @@ let package = Package(
         .library(
             name: "GoogleCloudTranslation",
             targets: ["Translation"]
+        ),
+        .library(
+            name: "GoogleCloudPubSub",
+            targets: ["PubSub"]
         ),
     ],
     dependencies: [
@@ -72,6 +76,13 @@ let package = Package(
             ],
             path: "Translation/Sources"
         ),
+        .target(
+            name: "PubSub",
+            dependencies: [
+                .target(name: "Core")
+            ],
+            path: "PubSub/Sources/"
+        ),
         .testTarget(
             name: "CoreTests",
             dependencies: [
@@ -100,6 +111,13 @@ let package = Package(
                 .target(name: "Translation")
             ],
             path: "Translation/Tests/"
+        ),
+        .testTarget(
+            name: "PubSubTests",
+            dependencies: [
+                .target(name: "PubSub")
+            ],
+            path: "PubSub/Tests/"
         ),
     ]
 )
