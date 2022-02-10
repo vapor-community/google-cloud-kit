@@ -14,18 +14,22 @@ public protocol SubscriptionsAPI {
     /// Gets the configuration details of a subscription.
     ///
     /// - parameter `subscriptionId`: The name of the subscription to get
+    ///             `subscriptionProject`: Name of the project that owns the subscription. If not provided, the default project will be used.
     /// - returns: An instance of the `Subscription`
-    func get(subscriptionId: String) -> EventLoopFuture<GoogleCloudPubSubSubscription>
+    func get(subscriptionId: String, subscriptionProject: String?) -> EventLoopFuture<GoogleCloudPubSubSubscription>
     
     /// Acknowledges the messages associated with the ackIds in the AcknowledgeRequest.
     ///
     /// - parameters `subscriptionId`: ID of the subscription whose message is being acknowledged
+    ///              `subscriptionProject`: Name of the project that owns the subscription. If not provided, the default project will be used.
     ///              `ackIds`: The acknowledgment ID for the messages being acknowledged that was returned by the Pub/Sub system in the subscriptions.pull response. Must not be empty.
-    func acknowledge(subscriptionId: String, ackIds: [String]) -> EventLoopFuture<EmptyResponse>
+    func acknowledge(subscriptionId: String, subscriptionProject: String?, ackIds: [String]) -> EventLoopFuture<EmptyResponse>
     
     /// Creates a subscription to a given topic.
     /// - parameter `subscriptionId`: The name of the subscription to be created.
+    ///             `subscriptionProject`: Name of the project that owns the subscription. If not provided, the default project will be used.
     ///             `topicId`: The name of the topic from which this subscription is receiving messages.
+    ///             `topicProject`: Name of the project that owns the topic. If not provided, the default project will be used.
     ///             `pushEndpoint`: A URL locating the endpoint to which messages should be pushed.
     ///             `pushConfigAttributes`: Endpoint configuration attributes that can be used to control different aspects of the message delivery.
     ///             `pushConfigOidcTokenServiceAccountEmail`:Service account email to be used for generating the OIDC token.
@@ -46,7 +50,9 @@ public protocol SubscriptionsAPI {
     /// - returns: If successful, the response body contains a newly created instance of Subscription.
     ///            If the subscription already exists, returns ALREADY_EXISTS. If the corresponding topic doesn't exist, returns NOT_FOUND.
     func create(subscriptionId: String,
+                subscriptionProject: String?,
                 topicId: String,
+                topicProject: String?,
                 pushEndpoint: String?,
                 pushConfigAttributes: [String: String]?,
                 pushConfigOidcTokenServiceAccountEmail: String?,
@@ -75,16 +81,16 @@ public final class GoogleCloudPubSubSubscriptionsAPI: SubscriptionsAPI {
         self.endpoint = endpoint
     }
     
-    public func get(subscriptionId: String) -> EventLoopFuture<GoogleCloudPubSubSubscription> {
-        return request.send(method: .GET, path: "\(endpoint)/v1/projects/\(request.project)/subscriptions/\(subscriptionId)")
+    public func get(subscriptionId: String, subscriptionProject: String? = nil) -> EventLoopFuture<GoogleCloudPubSubSubscription> {
+        return request.send(method: .GET, path: "\(endpoint)/v1/projects/\(subscriptionProject ?? request.project)/subscriptions/\(subscriptionId)")
     }
     
-    public func acknowledge(subscriptionId: String, ackIds: [String]) -> EventLoopFuture<EmptyResponse> {
+    public func acknowledge(subscriptionId: String, subscriptionProject: String? = nil, ackIds: [String]) -> EventLoopFuture<EmptyResponse> {
         do {
             let acks = AcknowledgeRequest(ackIds: ackIds)
             let body = try HTTPClient.Body.data(encoder.encode(acks))
             return request.send(method: .POST,
-                                path: "\(endpoint)/v1/projects/\(request.project)/subscriptions/\(subscriptionId):acknowledge",
+                                path: "\(endpoint)/v1/projects/\(subscriptionProject ?? request.project)/subscriptions/\(subscriptionId):acknowledge",
                                 body: body)
         } catch {
             return request.eventLoop.makeFailedFuture(error)
@@ -92,7 +98,9 @@ public final class GoogleCloudPubSubSubscriptionsAPI: SubscriptionsAPI {
     }
     
     public func create(subscriptionId: String,
+                       subscriptionProject: String? = nil,
                        topicId: String,
+                       topicProject: String? = nil,
                        pushEndpoint: String?,
                        pushConfigAttributes: [String: String]?,
                        pushConfigOidcTokenServiceAccountEmail: String?,
@@ -140,7 +148,7 @@ public final class GoogleCloudPubSubSubscriptionsAPI: SubscriptionsAPI {
             }
             
             let subscription = GoogleCloudPubSubSubscription(name: subscriptionId,
-                                                             topic: "projects/\(request.project)/topics/\(topicId)",
+                                                             topic: "projects/\(topicProject ?? request.project)/topics/\(topicId)",
                                                              pushConfig: pushConfig,
                                                              ackDeadlineSeconds: ackDeadlineSeconds,
                                                              retainAckedMessages: retainAckedMessages,
@@ -154,7 +162,7 @@ public final class GoogleCloudPubSubSubscriptionsAPI: SubscriptionsAPI {
                                                              detached: detached)
             let body = try HTTPClient.Body.data(encoder.encode(subscription))
             return request.send(method: .PUT,
-                                path: "\(endpoint)/v1/projects/\(request.project)/subscriptions/\(subscriptionId)",
+                                path: "\(endpoint)/v1/projects/\(subscriptionProject ?? request.project)/subscriptions/\(subscriptionId)",
                                 body: body)
         } catch {
             return request.eventLoop.makeFailedFuture(error)
