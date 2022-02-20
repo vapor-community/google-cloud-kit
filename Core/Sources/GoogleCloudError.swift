@@ -75,3 +75,9 @@ public struct GoogleCloudAPIError: Codable {
     /// The specific item within the locationType that caused the error. For example, if you specify an invalid value for a parameter, the location will be the name of the parameter.
     public var location: String?
 }
+
+public struct GoogleCloudOAuthError: GoogleCloudError, Codable {
+    public var error: String
+    public var errorDescription: String?
+    public var errorUri: String?
+}

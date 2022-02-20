@@ -51,13 +51,16 @@ public actor ServiceAccountCredentialsProvider: AccessTokenProvider {
     @discardableResult
     private func refresh() async throws -> String {
         let response = try await client.execute(buildRequest(), timeout: .seconds(10))
+        let body = Data(buffer: try await response.body.collect(upTo: 1024 * 1024)) // 1mb
         guard response.status == .ok else {
-            throw OauthRefreshError.noResponse(response.status)
+            do {
+                throw try decoder.decode(GoogleCloudOAuthError.self, from: body)
+            } catch {
+                throw OauthRefreshError.noResponse(response.status)                
+            }
         }
         
-        let body = try await response.body.collect(upTo: 1024 * 1024) // 1mb
-        
-        let token = try decoder.decode(AccessToken.self, from: Data(buffer: body))
+        let token = try decoder.decode(AccessToken.self, from: body)
         accessToken = token
         // scrape off 5 minutes so we're not runnung up against time boundaries.
         tokenExpiration = Date().addingTimeInterval(TimeInterval(token.expiresIn - 300))
