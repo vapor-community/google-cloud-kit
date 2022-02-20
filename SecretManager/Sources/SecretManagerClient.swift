@@ -3,52 +3,35 @@ import Foundation
 import AsyncHTTPClient
 import NIO
 
-public final class GoogleCloudSecretManagerClient {
+public struct GoogleCloudSecretManagerClient {
+    public var secrets: SecretVersionAPI
     
-    public var secrets: SecretsAPI
-    var secretManagerRequest: GoogleCloudSecretManagerRequest
+    let secretManagerRequest: GoogleCloudSecretManagerRequest
     
-    /// Initialize a client for interacting with the Google Cloud Secret Manager API
-    /// - Parameter credentials: The Credentials to use when authenticating with the APIs
-    /// - Parameter config: The configuration for the Secret Manager API
-    /// - Parameter httpClient: An `HTTPClient` used for making API requests.
-    /// - Parameter eventLoop: The EventLoop used to perform the work on.
-    /// - Parameter base: The base URL to use for the Datastore API
-    public init(credentials: GoogleCloudCredentialsConfiguration,
-                config: GoogleCloudSecretManagerConfiguration,
-                httpClient: HTTPClient,
-                eventLoop: EventLoop,
-                base: String = "https://secretmanager.googleapis.com") throws {
-        /// A token implementing `OAuthRefreshable`. Loaded from credentials specified by `GoogleCloudCredentialsConfiguration`.
-        let refreshableToken = OAuthCredentialLoader.getRefreshableToken(credentials: credentials,
-                                                                         withConfig: config,
-                                                                         andClient: httpClient,
-                                                                         eventLoop: eventLoop)
+    public init(strategy: CredentialsLoadingStrategy, client: HTTPClient, base: String = "https://secretmanager.googleapis.com") async throws {
+        let resolvedCredentials = try await CredentialsResolver.resolveCredentials(strategy: strategy)
         
-        /// Set the projectId to use for this client. In order of priority:
-        /// - Environment Variable (PROJECT_ID)
-        /// - Service Account's projectID
-        /// - `GoogleCloudSecretManagerConfigurations` `project` property (optionally configured).
-        /// - `GoogleCloudCredentialsConfiguration's` `project` property (optionally configured).
-        
-        guard let projectId = ProcessInfo.processInfo.environment["PROJECT_ID"] ??
-                              (refreshableToken as? OAuthServiceAccount)?.credentials.projectId ??
-                              config.project ?? credentials.project else {
-            throw GoogleCloudSecretManagerError.projectIdMissing
+        switch resolvedCredentials {
+        case .gcloud(let gCloudCredentials):
+            let provider = GCloudCredentialsProvider(client: client, credentials: gCloudCredentials)
+            secretManagerRequest = .init(tokenProvider: provider, client: client, project: gCloudCredentials.quotaProjectId)
+            
+        case .serviceAccount(let serviceAccountCredentials):
+            let provider = ServiceAccountCredentialsProvider(client: client, credentials: serviceAccountCredentials)
+            secretManagerRequest = .init(tokenProvider: provider, client: client, project: serviceAccountCredentials.projectId)
+            
+        case .computeEngine(let metadataUrl):
+            let projectId = ProcessInfo.processInfo.environment["PROJECT_ID"] ?? "default"
+            switch strategy {
+            case .computeEngine(let client, let scope):
+                let provider = ComputeEngineCredentialsProvider(client: client, scopes: scope, url: metadataUrl)
+                secretManagerRequest = .init(tokenProvider: provider, client: client, project: projectId)
+            default:
+                let provider = ComputeEngineCredentialsProvider(client: client, scopes: [], url: metadataUrl)
+                secretManagerRequest = .init(tokenProvider: provider, client: client, project: projectId)
+            }
         }
         
-        secretManagerRequest = GoogleCloudSecretManagerRequest(httpClient: httpClient,
-                                                       eventLoop: eventLoop,
-                                                       oauth: refreshableToken,
-                                                       project: projectId)
-        
-        secrets = GoogleCloudSecretManagerSecretsAPI(request: secretManagerRequest, endpoint: base)
-    }
-    
-    /// Hop to a new eventloop to execute requests on.
-    /// - Parameter eventLoop: The eventloop to execute requests on.
-    public func hopped(to eventLoop: EventLoop) -> GoogleCloudSecretManagerClient {
-        secretManagerRequest.eventLoop = eventLoop
-        return self
+        secrets = GoogleCloudSecretManagerSecretVersionAPI(request: secretManagerRequest, endpoint: base)
     }
 }
