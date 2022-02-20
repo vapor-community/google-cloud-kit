@@ -51,7 +51,7 @@ public struct SecretVersionReplicationStatus: Codable {
 ///
 /// Only populated if the parent Secret has an automatic replication policy.
 public struct SecretVersionReplicationStatusAutomatic: Codable {
-    public var customerManagedEncryption: SecretVersionReplicationStatusAutomaticCustomerManagedEncryption
+    public var customerManagedEncryption: SecretVersionReplicationStatusAutomaticCustomerManagedEncryption?
 }
 
 /// Describes the status of customer-managed encryption.
