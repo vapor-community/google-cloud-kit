@@ -6,10 +6,10 @@ let package = Package(
     name: "google-cloud-kit",
     platforms: [ .macOS(.v12)],
     products: [
-//        .library(
-//            name: "GoogleCloudKit",
-//            targets: ["Core", "Storage", "Datastore", "SecretManager", "PubSub"]
-//        ),
+        .library(
+            name: "GoogleCloudKit",
+            targets: ["Core",  "SecretManager"] //"Storage", "Datastore", "PubSub"
+        ),
         .library(
             name: "GoogleCloudCore",
             targets: ["Core"]
