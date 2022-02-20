@@ -53,11 +53,7 @@ public actor ServiceAccountCredentialsProvider: AccessTokenProvider {
         let response = try await client.execute(buildRequest(), timeout: .seconds(10))
         let body = Data(buffer: try await response.body.collect(upTo: 1024 * 1024)) // 1mb
         guard response.status == .ok else {
-            do {
-                throw try decoder.decode(GoogleCloudOAuthError.self, from: body)
-            } catch {
-                throw OauthRefreshError.noResponse(response.status)                
-            }
+            throw try decoder.decode(GoogleCloudOAuthError.self, from: body)
         }
         
         let token = try decoder.decode(AccessToken.self, from: body)
