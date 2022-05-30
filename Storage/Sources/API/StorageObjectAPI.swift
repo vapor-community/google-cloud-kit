@@ -336,7 +336,7 @@ public final class GoogleCloudStorageObjectAPI: StorageObjectAPI {
                                        "destination": destination,
                                        "sourceObjects": sourceObjects]
             let requestBody = try JSONSerialization.data(withJSONObject: body)
-            return request.send(method: .POST, path: "\(endpoint)/\(bucket)/o/\(destinationObject)/compose", query: queryParams, body: .data(requestBody))
+            return request.send(method: .POST, path: "\(endpoint)/\(bucket)/o/\(destinationObject.replacingOccurrences(of: "/", with: "%2F"))/compose", query: queryParams, body: .data(requestBody))
         } catch {
             return request.eventLoop.makeFailedFuture(error)
         }
@@ -355,7 +355,7 @@ public final class GoogleCloudStorageObjectAPI: StorageObjectAPI {
         
         do {
             let requestBody = try JSONSerialization.data(withJSONObject: object)
-            return request.send(method: .POST, path: "\(endpoint)/\(sourceBucket)/o/\(sourceObject)/copyTo/b/\(destinationBucket)/o/\(destinationObject)", query: queryParams, body: .data(requestBody))
+            return request.send(method: .POST, path: "\(endpoint)/\(sourceBucket)/o/\(sourceObject.replacingOccurrences(of: "/", with: "%2F"))/copyTo/b/\(destinationBucket)/o/\(destinationObject.replacingOccurrences(of: "/", with: "%2F"))", query: queryParams, body: .data(requestBody))
         } catch {
             return request.eventLoop.makeFailedFuture(error)
         }
@@ -367,7 +367,7 @@ public final class GoogleCloudStorageObjectAPI: StorageObjectAPI {
             queryParams = queryParameters.queryParameters
         }
         
-        return request.send(method: .DELETE, path: "\(endpoint)/\(bucket)/o/\(object)", query: queryParams)
+        return request.send(method: .DELETE, path: "\(endpoint)/\(bucket)/o/\(object.replacingOccurrences(of: "/", with: "%2F"))", query: queryParams)
     }
     
     public func get(bucket: String, object: String, queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageObject> {
@@ -376,7 +376,7 @@ public final class GoogleCloudStorageObjectAPI: StorageObjectAPI {
             queryParams = queryParameters.queryParameters
         }
         
-        return request.send(method: .GET, path: "\(endpoint)/\(bucket)/o/\(object)", query: queryParams)
+        return request.send(method: .GET, path: "\(endpoint)/\(bucket)/o/\(object.replacingOccurrences(of: "/", with: "%2F"))", query: queryParams)
     }
 
     public func getMedia(bucket: String, object: String, range: ClosedRange<Int>?, queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorgeDataResponse> {
@@ -394,7 +394,7 @@ public final class GoogleCloudStorageObjectAPI: StorageObjectAPI {
             headers.add(name: "Range", value: "bytes=\(range.lowerBound)-\(range.upperBound)")
         }
         
-        return request.send(method: .GET, headers: headers, path: "\(endpoint)/\(bucket)/o/\(object)", query: queryParams)
+        return request.send(method: .GET, headers: headers, path: "\(endpoint)/\(bucket)/o/\(object.replacingOccurrences(of: "/", with: "%2F"))", query: queryParams)
     }
     
     public func createSimpleUpload(bucket: String,
@@ -460,7 +460,7 @@ public final class GoogleCloudStorageObjectAPI: StorageObjectAPI {
         do {
             let requestBody = try JSONSerialization.data(withJSONObject: metadata)
             return request.send(method: .POST,
-                                path: "\(endpoint)/\(sourceBucket)/o/\(sourceObject)/rewriteTo/b/\(destinationBucket)/o/\(destinationObject)",
+                                path: "\(endpoint)/\(sourceBucket)/o/\(sourceObject.replacingOccurrences(of: "/", with: "%2F"))/rewriteTo/b/\(destinationBucket)/o/\(destinationObject.replacingOccurrences(of: "/", with: "%2F"))",
                                 query: queryParams,
                                 body: .data(requestBody))
         } catch {
@@ -521,7 +521,7 @@ public final class GoogleCloudStorageObjectAPI: StorageObjectAPI {
         
         do {
             let requestBody = try JSONSerialization.data(withJSONObject: body)
-            return request.send(method: .PUT, path: "\(endpoint)/\(bucket)/o/\(object)", query: queryParams, body: .data(requestBody))
+            return request.send(method: .PUT, path: "\(endpoint)/\(bucket)/o/\(object.replacingOccurrences(of: "/", with: "%2F"))", query: queryParams, body: .data(requestBody))
         } catch {
             return request.eventLoop.makeFailedFuture(error)
         }
