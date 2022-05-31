@@ -2,21 +2,17 @@ import Core
 import Foundation
 
 public enum GoogleCloudTranslationError: GoogleCloudError {
-    case projectIdMissing
     case unknownError(String)
 
     var localizedDescription: String {
         switch self {
-        case .projectIdMissing:
-            return "Missing project id for GoogleCloudStorage API. Did you forget to set your project id?"
         case .unknownError(let reason):
             return "An unknown error occured: \(reason)"
         }
     }
 }
 
-/// [Reference](https://cloud.google.com/storage/docs/json_api/v1/status-codes)
-public struct TranslationAPIError: GoogleCloudError, GoogleCloudModel {
+public struct TranslationAPIError: GoogleCloudError, Codable {
     /// A container for the error information.
     public var error: TranslationAPIErrorBody
 }

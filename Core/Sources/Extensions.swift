@@ -7,8 +7,6 @@
 
 import Foundation
 
-public protocol GoogleCloudModel: Codable {}
-
 extension Dictionary {
     
     public var queryParameters: String {

@@ -15,7 +15,7 @@ public enum GoogleCloudSecretManagerError: GoogleCloudError {
     }
 }
 
-public struct SecretManagerAPIError: GoogleCloudError, GoogleCloudModel {
+public struct SecretManagerAPIError: GoogleCloudError, Codable {
     /// A container for the error information.
     public var error: SecretManagerAPIErrorBody
 }

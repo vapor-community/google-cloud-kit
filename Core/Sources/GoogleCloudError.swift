@@ -9,21 +9,25 @@ import NIOHTTP1
 
 public protocol GoogleCloudError: Error {}
 
-enum CredentialLoadError: GoogleCloudError {
+public enum CredentialLoadError: GoogleCloudError {
     case fileLoadError(String)
-    case jsonLoadError
+    case computeEngineCheckNotAvailable
+    case computeEngineNotAvailable
     
     var localizedDescription: String {
         switch self {
         case .fileLoadError(let path):
             return "Failed to load GoogleCloud credentials from the file path \(path)"
-        case .jsonLoadError:
-            return "Failed to load GoogleCloud credentials from the JSON provided in the environment variable"
+            
+        case .computeEngineCheckNotAvailable:
+            return "Failed to load credentials. This is because the environment variable 'NO_GCE_CHECK' is set to 'true' which prevents the SDK from verifying if you're running on Compute Engine. Set 'NO_GCE_CHECK' to 'false' to avoid this."
+        case .computeEngineNotAvailable:
+            return  "ComputeEngineCredentialsProvider cannot find the metadata server. This is likely because code is not running on Google Compute Engine."
         }
     }
 }
 
-enum OauthRefreshError: GoogleCloudError {
+public enum OauthRefreshError: GoogleCloudError {
     case noResponse(HTTPResponseStatus)
     
     var localizedDescription: String {
@@ -34,9 +38,7 @@ enum OauthRefreshError: GoogleCloudError {
     }
 }
 
-
-
-public struct GoogleCloudAPIErrorMain: GoogleCloudError, GoogleCloudModel {
+public struct GoogleCloudAPIErrorMain: GoogleCloudError, Codable {
     /// A container for the error information.
     public var error: GoogleCloudAPIErrorBody
     
@@ -72,4 +74,10 @@ public struct GoogleCloudAPIError: Codable {
     public var locationType: String?
     /// The specific item within the locationType that caused the error. For example, if you specify an invalid value for a parameter, the location will be the name of the parameter.
     public var location: String?
+}
+
+public struct GoogleCloudOAuthError: GoogleCloudError, Codable {
+    public var error: String
+    public var errorDescription: String?
+    public var errorUri: String?
 }
