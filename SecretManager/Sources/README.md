@@ -33,6 +33,7 @@ let smc = try GoogleCloudSecretManagerClient(credentials: credentialsConfigurati
 
 ```
 The order of priority for which configured projectID the SecretManagerClient will use is as follows:
+1. `$GOOGLE_PROJECT_ID` environment variable.
 1. `$PROJECT_ID` environment variable.
 2. The Service Accounts projectID (Service account configured via the credentials path in the credentials configuration).
 3. `GoogleCloudSecretManagerConfiguration`'s `project` property.

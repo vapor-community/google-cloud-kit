@@ -17,7 +17,8 @@ public final class GoogleCloudPubSubClient {
                                                                          withConfig: config,
                                                                          andClient: httpClient,
                                                                          eventLoop: eventLoop)
-        guard let projectId = ProcessInfo.processInfo.environment["PROJECT_ID"] ??
+        guard let projectId = ProcessInfo.processInfo.environment["GOOGLE_PROJECT_ID"] ??
+                              ProcessInfo.processInfo.environment["PROJECT_ID"] ??
                               (refreshableToken as? OAuthServiceAccount)?.credentials.projectId ??
                               config.project ?? credentials.project else {
             throw GoogleCloudPubSubError.projectIdMissing
