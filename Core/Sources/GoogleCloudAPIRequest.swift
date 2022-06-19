@@ -11,7 +11,7 @@ import NIOFoundationCompat
 import NIOHTTP1
 import AsyncHTTPClient
 
-public protocol GoogleCloudAPIRequest: class {
+public protocol GoogleCloudAPIRequest: AnyObject {
     var refreshableToken: OAuthRefreshable { get }
     var project: String { get }
     var httpClient: HTTPClient { get }
