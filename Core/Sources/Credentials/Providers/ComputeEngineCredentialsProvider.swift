@@ -11,16 +11,16 @@ import NIO
 
 public actor ComputeEngineCredentialsProvider: AccessTokenProvider {
     static let metadataServerUrl = "http://metadata.google.internal"
-    let scopes: [String]
+    let scopes: String
     let client: HTTPClient
     let url: String?
     var accessToken: AccessToken?
     var tokenExpiration: Date?
     let decoder = JSONDecoder()
     
-    public init(client: HTTPClient, scopes: [String], url: String?) {
+    public init(client: HTTPClient, scopes: [GoogleCloudAPIScope], url: String?) {
         self.client = client
-        self.scopes = scopes
+        self.scopes = scopes.map(\.value).joined(separator: ",")
         self.url = url
         decoder.keyDecodingStrategy = .convertFromSnakeCase
     }
@@ -39,7 +39,7 @@ public actor ComputeEngineCredentialsProvider: AccessTokenProvider {
     }
     
     private func buildRequest() -> HTTPClientRequest {
-        let finalUrl = "\(url ?? Self.metadataServerUrl)/computeMetadata/v1/instance/service-accounts/default/token?scopes=\(scopes.joined(separator: ","))"
+        let finalUrl = "\(url ?? Self.metadataServerUrl)/computeMetadata/v1/instance/service-accounts/default/token?scopes=\(scopes)"
         
         var request = HTTPClientRequest(url: finalUrl)
         request.headers = ["Metadata-Flavor": "Google"]
@@ -56,8 +56,8 @@ public actor ComputeEngineCredentialsProvider: AccessTokenProvider {
 
         let token = try decoder.decode(AccessToken.self, from: body)
         accessToken = token
-        // scrape off 5 minutes so we're not runnung up against time boundaries.
-        tokenExpiration = Date().addingTimeInterval(TimeInterval(token.expiresIn - 300))
+        // scrape off 30 seconds so we're not runnung up against time boundaries.
+        tokenExpiration = Date().addingTimeInterval(TimeInterval(token.expiresIn - 30))
         return token.accessToken
     }
 }

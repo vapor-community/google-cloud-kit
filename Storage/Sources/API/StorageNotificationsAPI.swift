@@ -16,13 +16,13 @@ public protocol StorageNotificationsAPI {
     /// - Parameter bucket: The parent bucket of the notification.
     /// - Parameter notification: ID of the notification to delete.
     /// - Parameter queryParameters: [Optional query parameters](https://cloud.google.com/storage/docs/json_api/v1/notifications/delete#parameters)
-    func delete(bucket: String, notification: String, queryParameters: [String: String]?) -> EventLoopFuture<EmptyResponse>
+    func delete(bucket: String, notification: String, queryParameters: [String: String]?) async throws -> EmptyResponse
     
     /// View a Cloud Pub/Sub notification configuration on a given bucket.
     /// - Parameter bucket: The parent bucket of the notification.
     /// - Parameter notification: Notification ID
     /// - Parameter queryParameters: [Optional query parameters](https://cloud.google.com/storage/docs/json_api/v1/notifications/get#parameters)
-    func get(bucket: String, notification: String, queryParameters: [String: String]?) -> EventLoopFuture<StorageNotification>
+    func get(bucket: String, notification: String, queryParameters: [String: String]?) async throws -> StorageNotification
     
     /// Creates a Cloud Pub/Sub notification configuration for a given bucket.
     /// - Parameter bucket: The parent bucket of the notification.
@@ -38,41 +38,67 @@ public protocol StorageNotificationsAPI {
                 customAttributes: [String: Any]?,
                 eventTypes: [String]?,
                 objectNamePrefix: String?,
-                queryParameters: [String: String]?) -> EventLoopFuture<StorageNotification>
+                queryParameters: [String: String]?) async throws -> StorageNotification
     
     /// Retrieves a list of Cloud Pub/Sub notification configurations for a given bucket.
     /// - Parameter bucket: Name of a Google Cloud Storage bucket.
     /// - Parameter queryParameters: [Optional query parameters](https://cloud.google.com/storage/docs/json_api/v1/notifications/list#parameters)
-    func list(bucket: String, queryParameters: [String: String]?) -> EventLoopFuture<StorageNotificationsList>
+    func list(bucket: String, queryParameters: [String: String]?) async throws -> StorageNotificationsList
 }
 
 extension StorageNotificationsAPI {
-    public func delete(bucket: String, notification: String, queryParameters: [String: String]? = nil) -> EventLoopFuture<EmptyResponse> {
-        return delete(bucket: bucket, notification: notification, queryParameters: queryParameters)
+    public func delete(
+        bucket: String,
+        notification: String,
+        queryParameters: [String: String]? = nil
+    ) async throws -> EmptyResponse {
+        try await delete(
+            bucket: bucket,
+            notification: notification,
+            queryParameters: queryParameters
+        )
     }
     
-    public func get(bucket: String, notification: String, queryParameters: [String: String]? = nil) -> EventLoopFuture<StorageNotification> {
-        return get(bucket: bucket, notification: notification, queryParameters: queryParameters)
+    public func get(
+        bucket: String,
+        notification: String,
+        queryParameters: [String: String]? = nil
+    ) async throws -> StorageNotification {
+        try await get(
+            bucket: bucket,
+            notification: notification,
+            queryParameters: queryParameters
+        )
     }
     
-    func insert(bucket: String,
-                topic: String,
-                payloadFormat: String,
-                customAttributes: [String: Any]?,
-                eventTypes: [String]?,
-                objectNamePrefix: String?,
-                queryParameters: [String: String]?) -> EventLoopFuture<StorageNotification> {
-        return insert(bucket: bucket,
-                      topic: topic,
-                      payloadFormat: payloadFormat,
-                      customAttributes: customAttributes,
-                      eventTypes: eventTypes,
-                      objectNamePrefix: objectNamePrefix,
-                      queryParameters: queryParameters)
+    public func insert(
+        bucket: String,
+        topic: String,
+        payloadFormat: String,
+        customAttributes: [String: Any]? = nil,
+        eventTypes: [String]? = nil,
+        objectNamePrefix: String? = nil,
+        queryParameters: [String: String]? = nil
+    ) async throws -> StorageNotification {
+        try await insert(
+            bucket: bucket,
+            topic: topic,
+            payloadFormat: payloadFormat,
+            customAttributes: customAttributes,
+            eventTypes: eventTypes,
+            objectNamePrefix: objectNamePrefix,
+            queryParameters: queryParameters
+        )
     }
     
-    public func list(bucket: String, queryParameters: [String: String]? = nil) -> EventLoopFuture<StorageNotificationsList> {
-        return list(bucket: bucket, queryParameters: queryParameters)
+    public func list(
+        bucket: String,
+        queryParameters: [String: String]? = nil
+    ) async throws -> StorageNotificationsList {
+        try await list(
+            bucket: bucket,
+            queryParameters: queryParameters
+        )
     }
 }
 
@@ -84,31 +110,45 @@ public final class GoogleCloudStorageNotificationsAPI: StorageNotificationsAPI {
         self.request = request
     }
     
-    public func delete(bucket: String, notification: String, queryParameters: [String: String]?) -> EventLoopFuture<EmptyResponse> {
+    public func delete(
+        bucket: String,
+        notification: String,
+        queryParameters: [String: String]?
+    ) async throws -> EmptyResponse {
         var queryParams = ""
         if let queryParameters = queryParameters {
             queryParams = queryParameters.queryParameters
         }
         
-        return request.send(method: .DELETE, path: "\(endpoint)/\(bucket)/notificationConfigs/\(notification)", query: queryParams)
+        return try await request.send(method: .DELETE,
+                                      path: "\(endpoint)/\(bucket)/notificationConfigs/\(notification)",
+                                      query: queryParams)
     }
     
-    public func get(bucket: String, notification: String, queryParameters: [String: String]?) -> EventLoopFuture<StorageNotification> {
+    public func get(
+        bucket: String,
+        notification: String,
+        queryParameters: [String: String]?
+    ) async throws -> StorageNotification {
         var queryParams = ""
         if let queryParameters = queryParameters {
             queryParams = queryParameters.queryParameters
         }
         
-        return request.send(method: .GET, path: "\(endpoint)/\(bucket)/notificationConfigs/\(notification)", query: queryParams)
+        return try await request.send(method: .GET,
+                                      path: "\(endpoint)/\(bucket)/notificationConfigs/\(notification)",
+                                      query: queryParams)
     }
 
-    public func insert(bucket: String,
-                       topic: String,
-                       payloadFormat: String,
-                       customAttributes: [String: Any]?,
-                       eventTypes: [String]?,
-                       objectNamePrefix: String?,
-                       queryParameters: [String: String]?) -> EventLoopFuture<StorageNotification> {
+    public func insert(
+        bucket: String,
+        topic: String,
+        payloadFormat: String,
+        customAttributes: [String: Any]?,
+        eventTypes: [String]?,
+        objectNamePrefix: String?,
+        queryParameters: [String: String]?
+    ) async throws -> StorageNotification {
         var queryParams = ""
         if let queryParameters = queryParameters {
             queryParams = queryParameters.queryParameters
@@ -129,20 +169,24 @@ public final class GoogleCloudStorageNotificationsAPI: StorageNotificationsAPI {
             body["object_name_prefix"] = objectNamePrefix
         }
         
-        do {
-            let requestBody = try JSONSerialization.data(withJSONObject: body)
-            return request.send(method: .POST, path: "\(endpoint)/\(bucket)/notificationConfigs", query: queryParams, body: .data(requestBody))
-        } catch {
-            return request.eventLoop.makeFailedFuture(error)
-        }
+        let requestBody = try JSONSerialization.data(withJSONObject: body)
+        return try await request.send(method: .POST,
+                                      path: "\(endpoint)/\(bucket)/notificationConfigs",
+                                      query: queryParams,
+                                      body: .bytes(.init(data: requestBody)))
     }
     
-    public func list(bucket: String, queryParameters: [String: String]?) -> EventLoopFuture<StorageNotificationsList> {
+    public func list(
+        bucket: String,
+        queryParameters: [String: String]?
+    ) async throws -> StorageNotificationsList {
         var queryParams = ""
         if let queryParameters = queryParameters {
             queryParams = queryParameters.queryParameters
         }
         
-        return request.send(method: .GET, path: "\(endpoint)/\(bucket)/notificationConfigs", query: queryParams)
+        return try await request.send(method: .GET,
+                                      path: "\(endpoint)/\(bucket)/notificationConfigs",
+                                      query: queryParams)
     }
 }

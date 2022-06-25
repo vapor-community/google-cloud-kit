@@ -8,7 +8,7 @@
 import Core
 import Foundation
 
-public struct GoogleCloudStorageObject: GoogleCloudModel {
+public struct GoogleCloudStorageObject: Codable {
     /// The kind of item this is. For objects, this is always storage#object.
     public var kind: String?
     /// The ID of the object, including the bucket name, object name, and generation number.
@@ -125,7 +125,7 @@ public struct GoogleCloudStorageObject: GoogleCloudModel {
     }
 }
 
-public struct CustomerEncryption: GoogleCloudModel {
+public struct CustomerEncryption: Codable {
     /// The encryption algorithm.
     public var encryptionAlgorithm: String?
     /// SHA256 hash value of the encryption key.
@@ -138,7 +138,7 @@ public struct CustomerEncryption: GoogleCloudModel {
     }
 }
 
-public struct StorageSourcObject: GoogleCloudModel {
+public struct StorageSourcObject: Codable {
     /// The source object's name. The source object's bucket is implicitly the destination bucket.
     public var name: String?
     /// The generation of this object to use as the source.
@@ -155,7 +155,7 @@ public struct StorageSourcObject: GoogleCloudModel {
     }
 }
 
-public struct StorageObjectPreconditions: GoogleCloudModel {
+public struct StorageObjectPreconditions: Codable {
     /// Only perform the composition if the generation of the source object that would be used matches this value. If this value and a generation are both specified, they must be the same value or the call will fail.
     public var ifGenerationMatch: String?
     
@@ -164,7 +164,7 @@ public struct StorageObjectPreconditions: GoogleCloudModel {
     }
 }
 
-public struct StorageRewriteObject: GoogleCloudModel {
+public struct StorageRewriteObject: Codable {
     /// The kind of item this is.
     public var kind: String?
     
@@ -198,7 +198,7 @@ public struct StorageRewriteObject: GoogleCloudModel {
     }
 }
 
-public struct StorageNotificationChannel: GoogleCloudModel {
+public struct StorageNotificationChannel: Codable {
     /// Identifies this as a notification channel used to watch for changes to a resource. Value: the fixed string "api#channel".
     public var kind: String?
     
@@ -252,6 +252,6 @@ public struct StorageNotificationChannel: GoogleCloudModel {
     }
 }
 
-public struct GoogleCloudStorgeDataResponse: GoogleCloudModel {
+public struct GoogleCloudStorgeDataResponse: Codable {
     public var data: Data?
 }

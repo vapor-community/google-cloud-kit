@@ -23,7 +23,7 @@ public enum GoogleCloudStorageError: GoogleCloudError {
 }
 
 /// [Reference](https://cloud.google.com/storage/docs/json_api/v1/status-codes)
-public struct CloudStorageAPIError: GoogleCloudError, GoogleCloudModel {
+public struct CloudStorageAPIError: GoogleCloudError, Codable {
     /// A container for the error information.
     public var error: CloudStorageAPIErrorBody
 }

@@ -17,5 +17,5 @@ public enum CredentialsLoadingStrategy {
     /// Use the metadata API and provide a list of scopes for the credentials.
     ///
     /// You should use this if the client runs on a Google virtual machine instance such as Compute Engine.
-    case computeEngine(client: HTTPClient, scope: [String])
+    case computeEngine(client: HTTPClient, scope: [GoogleCloudAPIScope])
 }

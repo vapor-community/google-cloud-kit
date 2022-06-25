@@ -9,7 +9,7 @@ import Core
 import Foundation
 
 /// The Buckets resource represents a bucket in Google Cloud Storage. There is a single global namespace shared by all buckets. For more information, see Bucket Name Requirements.
-public struct GoogleCloudStorageBucket: GoogleCloudModel {
+public struct GoogleCloudStorageBucket: Codable {
     /// Access controls on the bucket, containing one or more bucketAccessControls Resources.
     public var acl: [BucketAccessControls]?
     /// The bucket's billing configuration.
@@ -60,7 +60,7 @@ public struct GoogleCloudStorageBucket: GoogleCloudModel {
     public var website: Website?
 }
 
-public struct BucketAccessControls: GoogleCloudModel {
+public struct BucketAccessControls: Codable {
     /// The kind of item this is. For bucket access control entries, this is always storage#bucketAccessControl.
     public var kind: String?
     /// The ID of the access-control entry.
@@ -109,7 +109,7 @@ public struct BucketAccessControls: GoogleCloudModel {
     }
 }
 
-public struct StorageNotification: GoogleCloudModel {
+public struct StorageNotification: Codable {
     /// The kind of item this is. For notifications, this is always storage#notification.
     public var kind: String?
     /// The ID of the notification.
@@ -162,7 +162,7 @@ public struct StorageNotification: GoogleCloudModel {
     }
 }
 
-public struct ObjectAccessControls: GoogleCloudModel {
+public struct ObjectAccessControls: Codable {
     /// The kind of item this is. For object access control entries, this is always storage#objectAccessControl.
     public var kind: String?
     /// The ID of the access-control entry.
@@ -219,7 +219,7 @@ public struct ObjectAccessControls: GoogleCloudModel {
     }
 }
 
-public struct ProjectTeam: GoogleCloudModel {
+public struct ProjectTeam: Codable {
     /// The project number.
     public var projectNumber: String?
     /// The team. Acceptable values are: "editors", "owners", "viewers"
@@ -232,7 +232,7 @@ public struct ProjectTeam: GoogleCloudModel {
     }
 }
 
-public struct Owner: GoogleCloudModel {
+public struct Owner: Codable {
     /// The entity, in the form project-owner-projectId.
     public var entity: String?
     /// The ID for the entity.
@@ -245,7 +245,7 @@ public struct Owner: GoogleCloudModel {
     }
 }
 
-public struct Website: GoogleCloudModel {
+public struct Website: Codable {
     /// If the requested object path is missing, the service will ensure the path has a trailing '/', append this suffix, and attempt to retrieve the resulting object. This allows the creation of index.html objects to represent directory pages.
     public var mainPageSuffix: String?
     /// If the requested object path is missing, and any mainPageSuffix object is missing, if applicable, the service will return the named object from this bucket as the content for a 404 Not Found result.
@@ -258,7 +258,7 @@ public struct Website: GoogleCloudModel {
     }
 }
 
-public struct Logging: GoogleCloudModel {
+public struct Logging: Codable {
     /// The destination bucket where the current bucket's logs should be placed.
     public var logBucket: String?
     /// A prefix for log object names.
@@ -271,7 +271,7 @@ public struct Logging: GoogleCloudModel {
     }
 }
 
-public struct Versioning: GoogleCloudModel {
+public struct Versioning: Codable {
     /// While set to true, versioning is fully enabled for this bucket.
     public var enabled: Bool?
     
@@ -280,7 +280,7 @@ public struct Versioning: GoogleCloudModel {
     }
 }
 
-public struct Cors: GoogleCloudModel {
+public struct Cors: Codable {
     /// The list of Origins eligible to receive CORS response headers. Note: "*" is permitted in the list of origins, and means "any Origin".
     public var origin: [String]?
     /// The list of HTTP methods on which to include CORS response headers, (GET, OPTIONS, POST, etc) Note: "*" is permitted in the list of methods, and means "any method".
@@ -301,7 +301,7 @@ public struct Cors: GoogleCloudModel {
     }
 }
 
-public struct Lifecycle: GoogleCloudModel {
+public struct Lifecycle: Codable {
     /// A lifecycle management rule, which is made of an action to take and the condition(s) under which the action will be taken.
     public var rule: [Rule]?
     
@@ -310,7 +310,7 @@ public struct Lifecycle: GoogleCloudModel {
     }
 }
 
-public struct Rule: GoogleCloudModel {
+public struct Rule: Codable {
     /// The action to take.
     public var action: Action?
     /// The condition(s) under which the action will be taken.
@@ -323,7 +323,7 @@ public struct Rule: GoogleCloudModel {
     }
 }
 
-public struct Action: GoogleCloudModel {
+public struct Action: Codable {
     /// Type of the action. Currently, only Delete and SetStorageClass are supported. Acceptable values are: "Delete", "SetStorageClass"
     public var type: String?
     /// Target storage class. Required iff the type of the action is SetStorageClass.
@@ -336,7 +336,7 @@ public struct Action: GoogleCloudModel {
     }
 }
 
-public struct Condition: GoogleCloudModel {
+public struct Condition: Codable {
     /// Age of an object (in days). This condition is satisfied when an object reaches the specified age.
     public var age: Int?
     /// A date in RFC 3339 format with only the date part (for instance, "2013-01-15"). This condition is satisfied when an object is created before midnight of the specified date in UTC.
@@ -361,7 +361,7 @@ public struct Condition: GoogleCloudModel {
     }
 }
 
-public struct Billing: GoogleCloudModel {
+public struct Billing: Codable {
     /// When set to true, bucket is requester pays.
     public var requesterPays: Bool?
     
@@ -370,7 +370,7 @@ public struct Billing: GoogleCloudModel {
     }
 }
 
-public struct Encryption: GoogleCloudModel {
+public struct Encryption: Codable {
     /// When set to true, bucket is requester pays.
     public var defaultKmsKeyName: String?
     
@@ -379,7 +379,7 @@ public struct Encryption: GoogleCloudModel {
     }
 }
 
-public struct RetentionPolicy: GoogleCloudModel {
+public struct RetentionPolicy: Codable {
     /// The time from which the retentionPolicy was effective, in RFC 3339 format.
     public var effectiveTime: Date?
     /// Whether or not the retentionPolicy is locked. If true, the retentionPolicy cannot be removed and the retention period cannot be reduced.
@@ -388,4 +388,4 @@ public struct RetentionPolicy: GoogleCloudModel {
     public var retentionPeriod: Int?
 }
 
-public struct EmptyResponse: GoogleCloudModel {}
+public struct EmptyResponse: Codable {}

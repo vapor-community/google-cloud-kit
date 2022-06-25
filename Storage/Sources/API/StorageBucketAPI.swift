@@ -14,17 +14,17 @@ public protocol StorageBucketAPI {
     /// Permanently deletes an empty bucket.
     /// - Parameter bucket: Name of a bucket.
     /// - Parameter queryParameters: [Optional query parameters](https://cloud.google.com/storage/docs/json_api/v1/buckets/delete#parameters)
-    func delete(bucket: String, queryParameters: [String: String]?) -> EventLoopFuture<EmptyResponse>
+    func delete(bucket: String, queryParameters: [String: String]?) async throws -> EmptyResponse
     
     /// Returns metadata for the specified bucket.
     /// - Parameter bucket: Name of a bucket.
     /// - Parameter queryParameters: [Optional query parameters](https://cloud.google.com/storage/docs/json_api/v1/buckets/get#parameters)
-    func get(bucket: String, queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageBucket>
+    func get(bucket: String, queryParameters: [String: String]?) async throws -> GoogleCloudStorageBucket
     
     /// Returns an IAM policy for the specified bucket.
     /// - Parameter bucket: Name of a bucket.
     /// - Parameter queryParameters: [Optional query parameters](https://cloud.google.com/storage/docs/json_api/v1/buckets/getIamPolicy#parameters)
-    func getIAMPolicy(bucket: String, queryParameters: [String: String]?) -> EventLoopFuture<IAMPolicy>
+    func getIAMPolicy(bucket: String, queryParameters: [String: String]?) async throws -> IAMPolicy
     
     /// Creates a new bucket. Google Cloud Storage uses a flat namespace, so you can't create a bucket with a name that is already in use.
     /// - Parameter name: The name of the bucket.
@@ -60,17 +60,17 @@ public protocol StorageBucketAPI {
                 storageClass: GoogleCloudStorageClass?,
                 versioning: [String: Any]?,
                 website: [String: Any]?,
-                queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageBucket>
+                queryParameters: [String: String]?) async throws -> GoogleCloudStorageBucket
     
     /// Retrieves a list of buckets for a given project.
     /// - Parameter queryParameters: [Optional query parameters](https://cloud.google.com/storage/docs/json_api/v1/buckets/list#parameters)
-    func list(queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageBucketList>
+    func list(queryParameters: [String: String]?) async throws -> GoogleCloudStorageBucketList
     
     /// Permanently locks the retention policy that is currently applied to the specified bucket.
     /// - Parameter bucket: Name of a bucket.
     /// - Parameter ifMetagenerationMatch: Makes the success of the request conditional on whether the bucket's current metageneration matches the given value.
     /// - Parameter queryParameters: [Optional query parameters](https://cloud.google.com/storage/docs/json_api/v1/buckets/lockRetentionPolicy#parameters)
-    func lockRetentionPolicy(bucket: String, ifMetagenerationMatch: Int, queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageBucket>
+    func lockRetentionPolicy(bucket: String, ifMetagenerationMatch: Int, queryParameters: [String: String]?) async throws -> GoogleCloudStorageBucket
     
     /// Updates a bucket. Changes to the bucket will be readable immediately after writing, but configuration changes may take time to propagate. This method supports patch semantics.
     /// - Parameter bucket: Name of a bucket.
@@ -104,7 +104,7 @@ public protocol StorageBucketAPI {
                storageClass: GoogleCloudStorageClass?,
                versioning: [String: Any]?,
                website: [String: Any]?,
-               queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageBucket>
+               queryParameters: [String: String]?) async throws -> GoogleCloudStorageBucket
     
     /// Updates an IAM policy for the specified bucket.
     /// - Parameter bucket: Name of a bucket.
@@ -118,13 +118,13 @@ public protocol StorageBucketAPI {
                       resourceId: String,
                       bindings: [[String: Any]],
                       etag: String,
-                      queryParameters: [String: String]?) -> EventLoopFuture<IAMPolicy>
+                      queryParameters: [String: String]?) async throws -> IAMPolicy
     
     /// Tests a set of permissions on the given bucket to see which, if any, are held by the caller.
     /// - Parameter bucket: Name of a bucket.
     /// - Parameter permissions: Permissions to test.
     /// - Parameter queryParameters: [Optional query parameters](https://cloud.google.com/storage/docs/json_api/v1/buckets/testIamPermissions#parameters)
-    func testIAMPermissions(bucket: String, permissions: [String], queryParameters: [String: String]?) -> EventLoopFuture<Permission>
+    func testIAMPermissions(bucket: String, permissions: [String], queryParameters: [String: String]?) async throws -> Permission
     
     /// Updates a bucket. Changes to the bucket are readable immediately after writing, but configuration changes may take time to propagate. This method sets the complete metadata of a bucket. If you want to change some of a bucket's metadata while leaving other parts unaffected, use the PATCH method instead.
     /// - Parameter bucket: Name of a bucket.
@@ -158,40 +158,51 @@ public protocol StorageBucketAPI {
                 storageClass: GoogleCloudStorageClass?,
                 versioning: [String: Any]?,
                 website: [String: Any]?,
-                queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageBucket>
+                queryParameters: [String: String]?) async throws -> GoogleCloudStorageBucket
 }
 
 extension StorageBucketAPI {
-    public func delete(bucket: String, queryParameters: [String: String]? = nil) -> EventLoopFuture<EmptyResponse> {
-        return delete(bucket: bucket, queryParameters: queryParameters)
+    public func delete(
+        bucket: String,
+        queryParameters: [String: String]? = nil
+    ) async throws -> EmptyResponse {
+        try await delete(bucket: bucket, queryParameters: queryParameters)
     }
     
-    public func get(bucket: String, queryParameters: [String: String]? = nil) -> EventLoopFuture<GoogleCloudStorageBucket> {
-        return get(bucket: bucket, queryParameters: queryParameters)
+    public func get(
+        bucket: String,
+        queryParameters: [String: String]? = nil
+    ) async throws -> GoogleCloudStorageBucket {
+        try await get(bucket: bucket, queryParameters: queryParameters)
     }
     
-    public func getIAMPolicy(bucket: String, queryParameters: [String: String]? = nil) -> EventLoopFuture<IAMPolicy> {
-        return getIAMPolicy(bucket: bucket, queryParameters: queryParameters)
+    public func getIAMPolicy(
+        bucket: String,
+        queryParameters: [String: String]? = nil
+    ) async throws -> IAMPolicy {
+        try await getIAMPolicy(bucket: bucket, queryParameters: queryParameters)
     }
         
-    public func insert(name: String,
-                       acl: [[String: Any]]? = nil,
-                       billing: [String: Any]? = nil,
-                       cors: [[String: Any]]? = nil,
-                       defaultEventBasedHold: Bool? = nil,
-                       defaultObjectAcl: [[String: Any]]? = nil,
-                       encryption: [String: Any]? = nil,
-                       iamConfiguration: [String: Any]? = nil,
-                       labels: [String: String]? = nil,
-                       lifecycle: [String: Any]? = nil,
-                       location: String? = nil,
-                       logging: [String: Any]? = nil,
-                       rententionPolicy: [String: Any]? = nil,
-                       storageClass: GoogleCloudStorageClass? = nil,
-                       versioning: [String: Any]? = nil,
-                       website: [String: Any]? = nil,
-                       queryParameters: [String: String]? = nil) -> EventLoopFuture<GoogleCloudStorageBucket> {
-        return insert(name: name,
+    public func insert(
+        name: String,
+        acl: [[String: Any]]? = nil,
+        billing: [String: Any]? = nil,
+        cors: [[String: Any]]? = nil,
+        defaultEventBasedHold: Bool? = nil,
+        defaultObjectAcl: [[String: Any]]? = nil,
+        encryption: [String: Any]? = nil,
+        iamConfiguration: [String: Any]? = nil,
+        labels: [String: String]? = nil,
+        lifecycle: [String: Any]? = nil,
+        location: String? = nil,
+        logging: [String: Any]? = nil,
+        rententionPolicy: [String: Any]? = nil,
+        storageClass: GoogleCloudStorageClass? = nil,
+        versioning: [String: Any]? = nil,
+        website: [String: Any]? = nil,
+        queryParameters: [String: String]? = nil
+    ) async throws -> GoogleCloudStorageBucket {
+        try await insert(name: name,
                       acl: acl,
                       billing: billing,
                       cors: cors,
@@ -210,98 +221,112 @@ extension StorageBucketAPI {
                       queryParameters: queryParameters)
     }
     
-    public func list(queryParameters: [String: String]? = nil) -> EventLoopFuture<GoogleCloudStorageBucketList> {
-        return list(queryParameters: queryParameters)
+    public func list(queryParameters: [String: String]? = nil) async throws -> GoogleCloudStorageBucketList {
+        try await list(queryParameters: queryParameters)
     }
 
-    public func lockRetentionPolicy(bucket: String, ifMetagenerationMatch: Int, queryParameters: [String: String]? = nil) -> EventLoopFuture<GoogleCloudStorageBucket> {
-        return lockRetentionPolicy(bucket: bucket, ifMetagenerationMatch: ifMetagenerationMatch, queryParameters: queryParameters)
+    public func lockRetentionPolicy(
+        bucket: String,
+        ifMetagenerationMatch: Int,
+        queryParameters: [String: String]? = nil
+    ) async throws -> GoogleCloudStorageBucket {
+        try await lockRetentionPolicy(bucket: bucket, ifMetagenerationMatch: ifMetagenerationMatch, queryParameters: queryParameters)
     }
     
-    public func patch(bucket: String,
-                      acl: [[String: Any]]? = nil,
-                      billing: [String: Any]? = nil,
-                      cors: [[String: Any]]? = nil,
-                      defaultEventBasedHold: Bool? = nil,
-                      defaultObjectAcl: [[String: Any]]? = nil,
-                      encryption: [String: Any]? = nil,
-                      iamConfiguration: [String: Any]? = nil,
-                      labels: [String: String]? = nil,
-                      lifecycle: [String: Any]? = nil,
-                      logging: [String: Any]? = nil,
-                      rententionPolicy: [String: Any]? = nil,
-                      storageClass: GoogleCloudStorageClass? = nil,
-                      versioning: [String: Any]? = nil,
-                      website: [String: Any]? = nil,
-                      queryParameters: [String: String]? = nil) -> EventLoopFuture<GoogleCloudStorageBucket> {
-        return patch(bucket: bucket,
-                     acl: acl,
-                     billing: billing,
-                     cors: cors,
-                     defaultEventBasedHold: defaultEventBasedHold,
-                     defaultObjectAcl: defaultObjectAcl,
-                     encryption: encryption,
-                     iamConfiguration: iamConfiguration,
-                     labels: labels,
-                     lifecycle: lifecycle,
-                     logging: logging,
-                     rententionPolicy: rententionPolicy,
-                     storageClass: storageClass,
-                     versioning: versioning,
-                     website: website,
-                     queryParameters: queryParameters)
+    public func patch(
+        bucket: String,
+        acl: [[String: Any]]? = nil,
+        billing: [String: Any]? = nil,
+        cors: [[String: Any]]? = nil,
+        defaultEventBasedHold: Bool? = nil,
+        defaultObjectAcl: [[String: Any]]? = nil,
+        encryption: [String: Any]? = nil,
+        iamConfiguration: [String: Any]? = nil,
+        labels: [String: String]? = nil,
+        lifecycle: [String: Any]? = nil,
+        logging: [String: Any]? = nil,
+        rententionPolicy: [String: Any]? = nil,
+        storageClass: GoogleCloudStorageClass? = nil,
+        versioning: [String: Any]? = nil,
+        website: [String: Any]? = nil,
+        queryParameters: [String: String]? = nil
+    ) async throws -> GoogleCloudStorageBucket {
+        try await patch(bucket: bucket,
+                        acl: acl,
+                        billing: billing,
+                        cors: cors,
+                        defaultEventBasedHold: defaultEventBasedHold,
+                        defaultObjectAcl: defaultObjectAcl,
+                        encryption: encryption,
+                        iamConfiguration: iamConfiguration,
+                        labels: labels,
+                        lifecycle: lifecycle,
+                        logging: logging,
+                        rententionPolicy: rententionPolicy,
+                        storageClass: storageClass,
+                        versioning: versioning,
+                        website: website,
+                        queryParameters: queryParameters)
     }
     
-    public func setIAMPolicy(bucket: String,
-                             kind: String,
-                             resourceId: String,
-                             bindings: [[String: Any]],
-                             etag: String,
-                             queryParameters: [String: String]? = nil) -> EventLoopFuture<IAMPolicy> {
-        return setIAMPolicy(bucket: bucket,
-                            kind: kind,
-                            resourceId: resourceId,
-                            bindings: bindings,
-                            etag: etag,
-                            queryParameters: queryParameters)
+    public func setIAMPolicy(
+        bucket: String,
+        kind: String,
+        resourceId: String,
+        bindings: [[String: Any]],
+        etag: String,
+        queryParameters: [String: String]? = nil
+    ) async throws -> IAMPolicy {
+        try await setIAMPolicy(bucket: bucket,
+                               kind: kind,
+                               resourceId: resourceId,
+                               bindings: bindings,
+                               etag: etag,
+                               queryParameters: queryParameters)
     }
     
-    public func testIAMPermissions(bucket: String, permissions: [String], queryParameters: [String: String]? = nil) -> EventLoopFuture<Permission> {
-        return testIAMPermissions(bucket: bucket, permissions: permissions, queryParameters: queryParameters)
+    public func testIAMPermissions(
+        bucket: String,
+        permissions: [String],
+        queryParameters: [String: String]? = nil
+    ) async throws -> Permission {
+        try await testIAMPermissions(bucket: bucket, permissions: permissions, queryParameters: queryParameters)
     }
     
-    public func update(bucket: String,
-                       acl: [[String: Any]],
-                       billing: [String: Any]?,
-                       cors: [[String: Any]]?,
-                       defaultEventBasedHold: Bool?,
-                       defaultObjectAcl: [[String: Any]]?,
-                       encryption: [String: Any]?,
-                       iamConfiguration: [String: Any]?,
-                       labels: [String: String]?,
-                       lifecycle: [String: Any]?,
-                       logging: [String: Any]?,
-                       rententionPolicy: [String: Any]?,
-                       storageClass: GoogleCloudStorageClass?,
-                       versioning: [String: Any]?,
-                       website: [String: Any]?,
-                       queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageBucket> {
-        return update(bucket: bucket,
-                      acl: acl,
-                      billing: billing,
-                      cors: cors,
-                      defaultEventBasedHold: defaultEventBasedHold,
-                      defaultObjectAcl: defaultObjectAcl,
-                      encryption: encryption,
-                      iamConfiguration: iamConfiguration,
-                      labels: labels,
-                      lifecycle: lifecycle,
-                      logging: logging,
-                      rententionPolicy: rententionPolicy,
-                      storageClass: storageClass,
-                      versioning: versioning,
-                      website: website,
-                      queryParameters: queryParameters)
+    public func update(
+        bucket: String,
+        acl: [[String: Any]],
+        billing: [String: Any]? = nil,
+        cors: [[String: Any]]? = nil,
+        defaultEventBasedHold: Bool? = nil,
+        defaultObjectAcl: [[String: Any]]? = nil,
+        encryption: [String: Any]? = nil,
+        iamConfiguration: [String: Any]? = nil,
+        labels: [String: String]? = nil,
+        lifecycle: [String: Any]? = nil,
+        logging: [String: Any]? = nil,
+        rententionPolicy: [String: Any]? = nil,
+        storageClass: GoogleCloudStorageClass? = nil,
+        versioning: [String: Any]? = nil,
+        website: [String: Any]? = nil,
+        queryParameters: [String: String]? = nil
+    ) async throws -> GoogleCloudStorageBucket {
+        try await update(bucket: bucket,
+                         acl: acl,
+                         billing: billing,
+                         cors: cors,
+                         defaultEventBasedHold: defaultEventBasedHold,
+                         defaultObjectAcl: defaultObjectAcl,
+                         encryption: encryption,
+                         iamConfiguration: iamConfiguration,
+                         labels: labels,
+                         lifecycle: lifecycle,
+                         logging: logging,
+                         rententionPolicy: rententionPolicy,
+                         storageClass: storageClass,
+                         versioning: versioning,
+                         website: website,
+                         queryParameters: queryParameters)
     }
 }
 
@@ -313,50 +338,58 @@ public final class GoogleCloudStorageBucketAPI: StorageBucketAPI {
         self.request = request
     }
     
-    public func delete(bucket: String, queryParameters: [String: String]?) -> EventLoopFuture<EmptyResponse> {
+    public func delete(
+        bucket: String,
+        queryParameters: [String: String]?
+    ) async throws -> EmptyResponse {
         var queryParams = ""
         if let queryParameters = queryParameters {
             queryParams = queryParameters.queryParameters
         }
         
-        return request.send(method: .DELETE, path: "\(endpoint)/\(bucket)", query: queryParams)
+        return try await request.send(method: .DELETE, path: "\(endpoint)/\(bucket)", query: queryParams)
     }
 
-    public func get(bucket: String, queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageBucket> {
+    public func get(
+        bucket: String,
+        queryParameters: [String: String]?
+    ) async throws -> GoogleCloudStorageBucket {
         var queryParams = ""
         if let queryParameters = queryParameters {
             queryParams = queryParameters.queryParameters
         }
         
-        return request.send(method: .GET, path: "\(endpoint)/\(bucket)", query: queryParams)
+        return try await request.send(method: .GET, path: "\(endpoint)/\(bucket)", query: queryParams)
     }
 
-    public func getIAMPolicy(bucket: String, queryParameters: [String: String]?) -> EventLoopFuture<IAMPolicy> {
+    public func getIAMPolicy(bucket: String, queryParameters: [String: String]?) async throws -> IAMPolicy {
         var queryParams = ""
         if let queryParameters = queryParameters {
             queryParams = queryParameters.queryParameters
         }
         
-        return request.send(method: .GET, path: "\(endpoint)/\(bucket)/iam", query: queryParams)
+        return try await request.send(method: .GET, path: "\(endpoint)/\(bucket)/iam", query: queryParams)
     }
     
-    public func insert(name: String,
-                       acl: [[String: Any]]?,
-                       billing: [String: Any]?,
-                       cors: [[String: Any]]?,
-                       defaultEventBasedHold: Bool?,
-                       defaultObjectAcl: [[String: Any]]?,
-                       encryption: [String: Any]?,
-                       iamConfiguration: [String: Any]?,
-                       labels: [String: String]?,
-                       lifecycle: [String: Any]?,
-                       location: String?,
-                       logging: [String: Any]?,
-                       rententionPolicy: [String: Any]?,
-                       storageClass: GoogleCloudStorageClass?,
-                       versioning: [String: Any]?,
-                       website: [String: Any]?,
-                       queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageBucket> {
+    public func insert(
+        name: String,
+        acl: [[String: Any]]? = nil,
+        billing: [String: Any]? = nil,
+        cors: [[String: Any]]? = nil,
+        defaultEventBasedHold: Bool? = nil,
+        defaultObjectAcl: [[String: Any]]? = nil,
+        encryption: [String: Any]? = nil,
+        iamConfiguration: [String: Any]? = nil,
+        labels: [String: String]? = nil,
+        lifecycle: [String: Any]? = nil,
+        location: String? = nil,
+        logging: [String: Any]? = nil,
+        rententionPolicy: [String: Any]? = nil,
+        storageClass: GoogleCloudStorageClass? = nil,
+        versioning: [String: Any]? = nil,
+        website: [String: Any]? = nil,
+        queryParameters: [String: String]? = nil
+    ) async throws -> GoogleCloudStorageBucket {
         var body: [String: Any] = ["name": name]
         var query = ""
 
@@ -427,15 +460,11 @@ public final class GoogleCloudStorageBucketAPI: StorageBucketAPI {
             website.forEach { body["website[\($0)]"] = $1 }
         }
 
-        do {
-            let requestBody = try JSONSerialization.data(withJSONObject: body)
-            return request.send(method: .POST, path: endpoint, query: query, body: .data(requestBody))
-        } catch {
-            return request.eventLoop.makeFailedFuture(error)
-        }
+        let requestBody = try JSONSerialization.data(withJSONObject: body)
+        return try await request.send(method: .POST, path: endpoint, query: query, body: .bytes(.init(data: requestBody)))
     }
     
-    public func list(queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageBucketList> {
+    public func list(queryParameters: [String: String]?) async throws -> GoogleCloudStorageBucketList {
         var query = ""
         
         if var queryParameters = queryParameters {
@@ -445,12 +474,14 @@ public final class GoogleCloudStorageBucketAPI: StorageBucketAPI {
             query = "project=\(request.project)"
         }
         
-        return request.send(method: .GET, path: endpoint, query: query)
+        return try await request.send(method: .GET, path: endpoint, query: query)
     }
     
-    public func lockRetentionPolicy(bucket: String,
-                                    ifMetagenerationMatch: Int,
-                                    queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageBucket> {
+    public func lockRetentionPolicy(
+        bucket: String,
+        ifMetagenerationMatch: Int,
+        queryParameters: [String: String]? = nil
+    ) async throws -> GoogleCloudStorageBucket {
         var query = ""
         
         if var queryParameters = queryParameters {
@@ -460,25 +491,27 @@ public final class GoogleCloudStorageBucketAPI: StorageBucketAPI {
             query = "ifMetagenerationMatch=\(ifMetagenerationMatch)"
         }
         
-        return request.send(method: .POST, path: "\(endpoint)/\(bucket)/lockRetentionPolicy", query: query)
+        return try await request.send(method: .POST, path: "\(endpoint)/\(bucket)/lockRetentionPolicy", query: query)
     }
 
-    public func patch(bucket: String,
-                      acl: [[String: Any]]?,
-                      billing: [String: Any]?,
-                      cors: [[String: Any]]?,
-                      defaultEventBasedHold: Bool?,
-                      defaultObjectAcl: [[String: Any]]?,
-                      encryption: [String: Any]?,
-                      iamConfiguration: [String: Any]?,
-                      labels: [String: String]?,
-                      lifecycle: [String: Any]?,
-                      logging: [String: Any]?,
-                      rententionPolicy: [String: Any]?,
-                      storageClass: GoogleCloudStorageClass?,
-                      versioning: [String: Any]?,
-                      website: [String: Any]?,
-                      queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageBucket> {
+    public func patch(
+        bucket: String,
+        acl: [[String: Any]]? = nil,
+        billing: [String: Any]? = nil,
+        cors: [[String: Any]]? = nil,
+        defaultEventBasedHold: Bool? = nil,
+        defaultObjectAcl: [[String: Any]]? = nil,
+        encryption: [String: Any]? = nil,
+        iamConfiguration: [String: Any]? = nil,
+        labels: [String: String]? = nil,
+        lifecycle: [String: Any]? = nil,
+        logging: [String: Any]? = nil,
+        rententionPolicy: [String: Any]? = nil,
+        storageClass: GoogleCloudStorageClass? = nil,
+        versioning: [String: Any]? = nil,
+        website: [String: Any]? = nil,
+        queryParameters: [String: String]? = nil
+    ) async throws -> GoogleCloudStorageBucket {
         var body: [String: Any] = [:]
         var query = ""
         
@@ -542,20 +575,18 @@ public final class GoogleCloudStorageBucketAPI: StorageBucketAPI {
             website.forEach { body["website[\($0)]"] = $1 }
         }
         
-        do {
-            let requestBody = try JSONSerialization.data(withJSONObject: body)
-            return request.send(method: .PATCH, path: endpoint, query: query, body: .data(requestBody))
-        } catch {
-            return request.eventLoop.makeFailedFuture(error)
-        }
+        let requestBody = try JSONSerialization.data(withJSONObject: body)
+        return try await request.send(method: .PATCH, path: endpoint, query: query, body: .bytes(.init(data: requestBody)))
     }
 
-    public func setIAMPolicy(bucket: String,
-                             kind: String,
-                             resourceId: String,
-                             bindings: [[String: Any]],
-                             etag: String,
-                             queryParameters: [String: String]?) -> EventLoopFuture<IAMPolicy> {
+    public func setIAMPolicy(
+        bucket: String,
+        kind: String,
+        resourceId: String,
+        bindings: [[String: Any]],
+        etag: String,
+        queryParameters: [String: String]? = nil
+    ) async throws -> IAMPolicy {
         var query = ""
 
         if let queryParameters = queryParameters {
@@ -567,15 +598,15 @@ public final class GoogleCloudStorageBucketAPI: StorageBucketAPI {
                                    "bindings": bindings,
                                    "etag": etag]
 
-        do {
-            let requestBody = try JSONSerialization.data(withJSONObject: body)
-            return request.send(method: .PUT, path: "\(endpoint)/\(bucket)/iam", query: query, body: .data(requestBody))
-        } catch {
-            return request.eventLoop.makeFailedFuture(error)
-        }
+        let requestBody = try JSONSerialization.data(withJSONObject: body)
+        return try await request.send(method: .PUT, path: "\(endpoint)/\(bucket)/iam", query: query, body: .bytes(.init(data: requestBody)))
     }
     
-    public func testIAMPermissions(bucket: String, permissions: [String], queryParameters: [String: String]?) -> EventLoopFuture<Permission> {
+    public func testIAMPermissions(
+        bucket: String,
+        permissions: [String],
+        queryParameters: [String: String]? = nil
+    ) async throws -> Permission {
         var query = ""
         
         if let queryParameters = queryParameters {
@@ -590,25 +621,27 @@ public final class GoogleCloudStorageBucketAPI: StorageBucketAPI {
         
         query.append(perms)
         
-        return request.send(method: .GET, path: "\(endpoint)/\(bucket)/iam/testPermissions", query: query)
+        return try await request.send(method: .GET, path: "\(endpoint)/\(bucket)/iam/testPermissions", query: query)
     }
     
-    public func update(bucket: String,
-                       acl: [[String: Any]],
-                       billing: [String: Any]?,
-                       cors: [[String: Any]]?,
-                       defaultEventBasedHold: Bool?,
-                       defaultObjectAcl: [[String: Any]]?,
-                       encryption: [String: Any]?,
-                       iamConfiguration: [String: Any]?,
-                       labels: [String: String]?,
-                       lifecycle: [String: Any]?,
-                       logging: [String: Any]?,
-                       rententionPolicy: [String: Any]?,
-                       storageClass: GoogleCloudStorageClass?,
-                       versioning: [String: Any]?,
-                       website: [String: Any]?,
-                       queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageBucket> {
+    public func update(
+        bucket: String,
+        acl: [[String: Any]],
+        billing: [String: Any]? = nil,
+        cors: [[String: Any]]? = nil,
+        defaultEventBasedHold: Bool? = nil,
+        defaultObjectAcl: [[String: Any]]? = nil,
+        encryption: [String: Any]? = nil,
+        iamConfiguration: [String: Any]? = nil,
+        labels: [String: String]? = nil,
+        lifecycle: [String: Any]? = nil,
+        logging: [String: Any]? = nil,
+        rententionPolicy: [String: Any]? = nil,
+        storageClass: GoogleCloudStorageClass? = nil,
+        versioning: [String: Any]? = nil,
+        website: [String: Any]? = nil,
+        queryParameters: [String: String]? = nil
+    ) async throws -> GoogleCloudStorageBucket {
         var body: [String: Any] = [:]
         var query = ""
         
@@ -670,11 +703,7 @@ public final class GoogleCloudStorageBucketAPI: StorageBucketAPI {
             website.forEach { body["website[\($0)]"] = $1 }
         }
         
-        do {
-            let requestBody = try JSONSerialization.data(withJSONObject: body)
-            return request.send(method: .PUT, path: "\(endpoint)/\(bucket)", query: query, body: .data(requestBody))
-        } catch {
-            return request.eventLoop.makeFailedFuture(error)
-        }
+        let requestBody = try JSONSerialization.data(withJSONObject: body)
+        return try await request.send(method: .PUT, path: "\(endpoint)/\(bucket)", query: query, body: .bytes(.init(data: requestBody)))
     }
 }

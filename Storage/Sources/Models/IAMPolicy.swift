@@ -7,7 +7,7 @@
 
 import Core
 
-public struct IAMPolicy: GoogleCloudModel {
+public struct IAMPolicy: Codable {
     /// The kind of item this is. For policies, this is always storage#policy. This field is ignored on input.
     public var kind: String?
     /// The ID of the resource to which this policy belongs.
@@ -28,7 +28,7 @@ public struct IAMPolicy: GoogleCloudModel {
     }
 }
 
-public struct Binding: GoogleCloudModel {
+public struct Binding: Codable {
     /// The role to which members belong.
     public var role: String?
     /// A collection of identifiers for members who may assume the provided role.
@@ -45,7 +45,7 @@ public struct Binding: GoogleCloudModel {
     }
 }
 
-public struct Permission: GoogleCloudModel {
+public struct Permission: Codable {
     /// The kind of item this is.
     public var kind: String?
     /// The permissions held by the caller. 

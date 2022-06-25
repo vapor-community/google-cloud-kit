@@ -24,7 +24,7 @@ public protocol StorageObjectAPI {
                  kind: String,
                  destination: [String: Any],
                  sourceObjects: [[String: Any]],
-                 queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageObject>
+                 queryParameters: [String: String]?) async throws -> GoogleCloudStorageObject
     
     /// Copies a source object to a destination object. Optionally overrides metadata.
     /// - Parameter destinationBucket: Name of the bucket in which to store the new object. Overrides the provided object metadata's bucket value, if any.For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
@@ -38,26 +38,26 @@ public protocol StorageObjectAPI {
               sourceBucket: String,
               sourceObject: String,
               object: [String: Any],
-              queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageObject>
+              queryParameters: [String: String]?) async throws -> GoogleCloudStorageObject
     
     /// Deletes an object and its metadata. Deletions are permanent if versioning is not enabled for the bucket, or if the generation parameter is used.
     /// - Parameter bucket: Name of the bucket in which the object resides.
     /// - Parameter object: Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     /// - Parameter queryParameters: [Optional query parameters](https://cloud.google.com/storage/docs/json_api/v1/objects/delete#parameters)
-    func delete(bucket: String, object: String, queryParameters: [String: String]?) -> EventLoopFuture<EmptyResponse>
+    func delete(bucket: String, object: String, queryParameters: [String: String]?) async throws -> EmptyResponse
     
     /// Retrieves object metadata.
     /// - Parameter bucket: Name of the bucket in which the object resides.
     /// - Parameter object: Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     /// - Parameter queryParameters: [Optional query parameters](https://cloud.google.com/storage/docs/json_api/v1/objects/get#parameters)
-    func get(bucket: String, object: String, queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageObject>
+    func get(bucket: String, object: String, queryParameters: [String: String]?) async throws -> GoogleCloudStorageObject
     
     /// Retrieves object data.
     /// - Parameter bucket: Name of the bucket in which the object resides.
     /// - Parameter object: Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     /// - Parameter range: Range of data to download.
     /// - Parameter queryParameters: [Optional query parameters](https://cloud.google.com/storage/docs/json_api/v1/objects/get#parameters)
-    func getMedia(bucket: String, object: String, range: ClosedRange<Int>?, queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorgeDataResponse>
+    func getMedia(bucket: String, object: String, range: ClosedRange<Int>?, queryParameters: [String: String]?) async throws -> GoogleCloudStorgeDataResponse
     
     /// Stores a new object with no metadata.
     /// - Parameter bucket: Name of the bucket in which to store the new object. Overrides the provided object metadata's bucket value, if any.
@@ -66,10 +66,10 @@ public protocol StorageObjectAPI {
     /// - Parameter contentType: Content-Type of the object data. If an object is stored without a Content-Type, it is served as application/octet-stream.
     /// - Parameter queryParameters: [Optional query parameters](https://cloud.google.com/storage/docs/json_api/v1/objects/insert#parameters)
     func createSimpleUpload(bucket: String,
-                            body: HTTPClient.Body,
+                            body: HTTPClientRequest.Body,
                             name: String,
                             contentType: String,
-                            queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageObject>
+                            queryParameters: [String: String]?) async throws -> GoogleCloudStorageObject
     
     /// Stores a new object with no metadata.
     /// - Parameter bucket: Name of the bucket in which to store the new object. Overrides the provided object metadata's bucket value, if any.
@@ -81,12 +81,12 @@ public protocol StorageObjectAPI {
                             data: Data,
                             name: String,
                             contentType: String,
-                            queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageObject>
+                            queryParameters: [String: String]?) async throws -> GoogleCloudStorageObject
     
     /// Retrieves a list of objects matching the criteria.
     /// - Parameter bucket: Name of the bucket in which to look for objects.
     /// - Parameter queryParameters: [Optional query parameters](https://cloud.google.com/storage/docs/json_api/v1/list/insert#parameters)
-    func list(bucket: String, queryParameters: [String: String]?) -> EventLoopFuture<StorageObjectList>
+    func list(bucket: String, queryParameters: [String: String]?) async throws -> StorageObjectList
     
     /// Updates a data blob's associated metadata. This method supports patch semantics.
     /// - Parameter bucket: Name of the bucket in which the object resides.
@@ -96,7 +96,7 @@ public protocol StorageObjectAPI {
     func patch(bucket: String,
                object: String,
                metadata: [String: Any],
-               queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageObject>
+               queryParameters: [String: String]?) async throws -> GoogleCloudStorageObject
     
     /// Rewrites a source object to a destination object. Optionally overrides metadata.
     /// - Parameter destinationBucket: Name of the bucket in which to store the new object. Overrides the provided object metadata's bucket value, if any.
@@ -110,7 +110,7 @@ public protocol StorageObjectAPI {
                  sourceBucket: String,
                  sourceObject: String,
                  metadata: [String: Any],
-                 queryParameters: [String: String]?) -> EventLoopFuture<StorageRewriteObject>
+                 queryParameters: [String: String]?) async throws -> StorageRewriteObject
     
     /// Updates an object's metadata.
     /// - Parameter bucket: Name of the bucket in which the object resides.
@@ -136,7 +136,7 @@ public protocol StorageObjectAPI {
                 eventBasedHold: Bool?,
                 metadata: [String: String]?,
                 temporaryHold: Bool?,
-                queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageObject>
+                queryParameters: [String: String]?) async throws -> GoogleCloudStorageObject
     
     /// Watch for changes on all objects in a bucket.
     /// - Parameter bucket: Name of the bucket in which to look for objects.
@@ -162,152 +162,216 @@ public protocol StorageObjectAPI {
                   address: String,
                   params: [String: String]?,
                   payload: Bool?,
-                  queryParameters: [String: String]?) -> EventLoopFuture<StorageNotificationChannel>
+                  queryParameters: [String: String]?) async throws -> StorageNotificationChannel
 }
 
 extension StorageObjectAPI {
-    public func compose(bucket: String,
-                        destinationObject: String,
-                        kind: String,
-                        destination: [String: Any],
-                        sourceObjects: [[String: Any]],
-                        queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageObject> {
-        return compose(bucket: bucket,
-                       destinationObject: destinationObject,
-                       kind: kind,
-                       destination: destination,
-                       sourceObjects: sourceObjects,
-                       queryParameters: queryParameters)
+    public func compose(
+        bucket: String,
+        destinationObject: String,
+        kind: String,
+        destination: [String: Any],
+        sourceObjects: [[String: Any]],
+        queryParameters: [String: String]? = nil
+    ) async throws -> GoogleCloudStorageObject {
+        try await compose(
+            bucket: bucket,
+            destinationObject: destinationObject,
+            kind: kind,
+            destination: destination,
+            sourceObjects: sourceObjects,
+            queryParameters: queryParameters
+        )
     }
     
-    public func copy(destinationBucket: String,
-              destinationObject: String,
-              sourceBucket: String,
-              sourceObject: String,
-              object: [String: Any],
-              queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageObject> {
-        return copy(destinationBucket: destinationBucket,
-                    destinationObject: destinationObject,
-                    sourceBucket: sourceBucket,
-                    sourceObject: sourceObject,
-                    object: object,
-                    queryParameters: queryParameters)
+    public func copy(
+        destinationBucket: String,
+        destinationObject: String,
+        sourceBucket: String,
+        sourceObject: String,
+        object: [String: Any],
+        queryParameters: [String: String]? = nil
+    ) async throws -> GoogleCloudStorageObject {
+        try await copy(
+            destinationBucket: destinationBucket,
+            destinationObject: destinationObject,
+            sourceBucket: sourceBucket,
+            sourceObject: sourceObject,
+            object: object,
+            queryParameters: queryParameters
+        )
     }
     
-    public func delete(bucket: String, object: String, queryParameters: [String: String]? = nil) -> EventLoopFuture<EmptyResponse> {
-        return delete(bucket: bucket, object: object, queryParameters: queryParameters)
+    public func delete(
+        bucket: String,
+        object: String,
+        queryParameters: [String: String]? = nil
+    ) async throws -> EmptyResponse {
+        try await delete(
+            bucket: bucket,
+            object: object,
+            queryParameters: queryParameters
+        )
     }
     
-    public func get(bucket: String, object: String, queryParameters: [String: String]? = nil) -> EventLoopFuture<GoogleCloudStorageObject> {
-        return get(bucket: bucket, object: object, queryParameters: queryParameters)
+    public func get(
+        bucket: String,
+        object: String,
+        queryParameters: [String: String]? = nil
+    ) async throws -> GoogleCloudStorageObject {
+        try await get(
+            bucket: bucket,
+            object: object,
+            queryParameters: queryParameters
+        )
     }
     
-    public func getMedia(bucket: String, object: String, range: ClosedRange<Int>? = nil, queryParameters: [String: String]? = nil) -> EventLoopFuture<GoogleCloudStorgeDataResponse> {
-        return getMedia(bucket: bucket, object: object, range: range, queryParameters: queryParameters)
+    public func getMedia(
+        bucket: String,
+        object: String,
+        range: ClosedRange<Int>? = nil,
+        queryParameters: [String: String]? = nil
+    ) async throws -> GoogleCloudStorgeDataResponse {
+        try await getMedia(
+            bucket: bucket,
+            object: object,
+            range: range,
+            queryParameters: queryParameters
+        )
     }
     
-    public func createSimpleUpload(bucket: String,
-                                   body: HTTPClient.Body,
-                                   name: String,
-                                   contentType: String,
-                                   queryParameters: [String: String]? = nil) -> EventLoopFuture<GoogleCloudStorageObject> {
-        return createSimpleUpload(bucket: bucket,
-                                  body: body,
-                                  name: name,
-                                  contentType: contentType,
-                                  queryParameters: queryParameters)
+    public func createSimpleUpload(
+        bucket: String,
+        body: HTTPClientRequest.Body,
+        name: String,
+        contentType: String,
+        queryParameters: [String: String]? = nil
+    ) async throws -> GoogleCloudStorageObject {
+        try await createSimpleUpload(
+            bucket: bucket,
+            body: body,
+            name: name,
+            contentType: contentType,
+            queryParameters: queryParameters
+        )
     }
     
-    public func createSimpleUpload(bucket: String,
-                                   data: Data,
-                                   name: String,
-                                   contentType: String,
-                                   queryParameters: [String: String]? = nil) -> EventLoopFuture<GoogleCloudStorageObject> {
-        return createSimpleUpload(bucket: bucket,
-                                  body: .data(data),
-                                  name: name,
-                                  contentType: contentType,
-                                  queryParameters: queryParameters)
+    public func createSimpleUpload(
+        bucket: String,
+        data: Data,
+        name: String,
+        contentType: String,
+        queryParameters: [String: String]? = nil
+    ) async throws -> GoogleCloudStorageObject {
+        try await createSimpleUpload(
+            bucket: bucket,
+            data: data,
+            name: name,
+            contentType: contentType,
+            queryParameters: queryParameters
+        )
     }
     
-    public func list(bucket: String, queryParameters: [String: String]? = nil) -> EventLoopFuture<StorageObjectList> {
-        return list(bucket: bucket, queryParameters: queryParameters)
+    public func list(
+        bucket: String,
+        queryParameters: [String: String]? = nil
+    ) async throws -> StorageObjectList {
+        try await list(
+            bucket: bucket,
+            queryParameters: queryParameters
+        )
     }
 
-    public func patch(bucket: String,
-                      object: String,
-                      metadata: [String: Any],
-                      queryParameters: [String: String]? = nil) -> EventLoopFuture<GoogleCloudStorageObject> {
-        return patch(bucket: bucket,
-                     object: object,
-                     metadata: metadata,
-                     queryParameters: queryParameters)
+    public func patch(
+        bucket: String,
+        object: String,
+        metadata: [String: Any],
+        queryParameters: [String: String]? = nil
+    ) async throws -> GoogleCloudStorageObject {
+        try await patch(
+            bucket: bucket,
+            object: object,
+            metadata: metadata,
+            queryParameters: queryParameters
+        )
     }
 
-    public func rewrite(destinationBucket: String,
-                        destinationObject: String,
-                        sourceBucket: String,
-                        sourceObject: String,
-                        metadata: [String: Any],
-                        queryParameters: [String: String]? = nil) -> EventLoopFuture<StorageRewriteObject> {
-        return rewrite(destinationBucket: destinationBucket,
-                       destinationObject: destinationObject,
-                       sourceBucket: sourceBucket,
-                       sourceObject: sourceObject,
-                       metadata: metadata,
-                       queryParameters: queryParameters)
+    public func rewrite(
+        destinationBucket: String,
+        destinationObject: String,
+        sourceBucket: String,
+        sourceObject: String,
+        metadata: [String: Any],
+        queryParameters: [String: String]? = nil
+    ) async throws -> StorageRewriteObject {
+        try await rewrite(
+            destinationBucket: destinationBucket,
+            destinationObject: destinationObject,
+            sourceBucket: sourceBucket,
+            sourceObject: sourceObject,
+            metadata: metadata,
+            queryParameters: queryParameters
+        )
     }
     
-    public func update(bucket: String,
-                       object: String,
-                       acl: [[String: Any]],
-                       cacheControl: String?,
-                       contentDisposition: String?,
-                       contentEncoding: String?,
-                       contentLanguage: String?,
-                       contentType: String?,
-                       eventBasedHold: Bool?,
-                       metadata: [String: String]?,
-                       temporaryHold: Bool?,
-                       queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageObject> {
-        return update(bucket: bucket,
-                      object: object,
-                      acl: acl,
-                      cacheControl: cacheControl,
-                      contentDisposition: contentDisposition,
-                      contentEncoding: contentEncoding,
-                      contentLanguage: contentLanguage,
-                      contentType: contentType,
-                      eventBasedHold: eventBasedHold,
-                      metadata: metadata,
-                      temporaryHold: temporaryHold,
-                      queryParameters: queryParameters)
+    public func update(
+        bucket: String,
+        object: String,
+        acl: [[String: Any]],
+        cacheControl: String? = nil,
+        contentDisposition: String? = nil,
+        contentEncoding: String? = nil,
+        contentLanguage: String? = nil,
+        contentType: String? = nil,
+        eventBasedHold: Bool? = nil,
+        metadata: [String: String]? = nil,
+        temporaryHold: Bool? = nil,
+        queryParameters: [String: String]? = nil
+    ) async throws -> GoogleCloudStorageObject {
+        try await update(
+            bucket: bucket,
+            object: object,
+            acl: acl,
+            cacheControl: cacheControl,
+            contentDisposition: contentDisposition,
+            contentEncoding: contentEncoding,
+            contentLanguage: contentLanguage,
+            contentType: contentType,
+            eventBasedHold: eventBasedHold,
+            metadata: metadata,
+            temporaryHold: temporaryHold,
+            queryParameters: queryParameters
+        )
     }
     
-    public func watchAll(bucket: String,
-                         kind: String,
-                         id: String,
-                         resourceId: String,
-                         resourceUri: String,
-                         token: String?,
-                         expiration: Date?,
-                         type: String,
-                         address: String,
-                         params: [String: String]?,
-                         payload: Bool?,
-                         queryParameters: [String: String]?) -> EventLoopFuture<StorageNotificationChannel> {
-        return watchAll(bucket: bucket,
-                        kind: kind,
-                        id: id,
-                        resourceId: resourceId,
-                        resourceUri: resourceUri,
-                        token: token,
-                        expiration: expiration,
-                        type: type,
-                        address: address,
-                        params: params,
-                        payload: payload,
-                        queryParameters: queryParameters)
+    public func watchAll(
+        bucket: String,
+        kind: String,
+        id: String,
+        resourceId: String,
+        resourceUri: String,
+        token: String? = nil,
+        expiration: Date? = nil,
+        type: String,
+        address: String,
+        params: [String: String]? = nil,
+        payload: Bool? = nil,
+        queryParameters: [String: String]? = nil
+    ) async throws -> StorageNotificationChannel {
+        try await watchAll(
+            bucket: bucket,
+            kind: kind,
+            id: id,
+            resourceId: resourceId,
+            resourceUri: resourceUri,
+            token: token,
+            expiration: expiration,
+            type: type,
+            address: address,
+            params: params,
+            payload: payload,
+            queryParameters: queryParameters
+        )
     }
 }
 
@@ -320,66 +384,82 @@ public final class GoogleCloudStorageObjectAPI: StorageObjectAPI {
         self.request = request
     }
 
-    public func compose(bucket: String,
-                        destinationObject: String,
-                        kind: String,
-                        destination: [String: Any],
-                        sourceObjects: [[String: Any]],
-                        queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageObject> {
+    public func compose(
+        bucket: String,
+        destinationObject: String,
+        kind: String,
+        destination: [String: Any],
+        sourceObjects: [[String: Any]],
+        queryParameters: [String: String]? = nil
+    ) async throws -> GoogleCloudStorageObject {
         var queryParams = ""
         if let queryParameters = queryParameters {
             queryParams = queryParameters.queryParameters
         }
         
-        do {
-            let body: [String: Any] = ["kind": kind,
-                                       "destination": destination,
-                                       "sourceObjects": sourceObjects]
-            let requestBody = try JSONSerialization.data(withJSONObject: body)
-            return request.send(method: .POST, path: "\(endpoint)/\(bucket)/o/\(destinationObject)/compose", query: queryParams, body: .data(requestBody))
-        } catch {
-            return request.eventLoop.makeFailedFuture(error)
-        }
+        let body: [String: Any] = ["kind": kind,
+                                   "destination": destination,
+                                   "sourceObjects": sourceObjects]
+        
+        let requestBody = try JSONSerialization.data(withJSONObject: body)
+        return try await request.send(method: .POST,
+                                      path: "\(endpoint)/\(bucket)/o/\(destinationObject)/compose",
+                                      query: queryParams,
+                                      body: .bytes(.init(data: requestBody)))
     }
     
-    public func copy(destinationBucket: String,
-                     destinationObject: String,
-                     sourceBucket: String,
-                     sourceObject: String,
-                     object: [String: Any],
-                     queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageObject> {
+    public func copy(
+        destinationBucket: String,
+        destinationObject: String,
+        sourceBucket: String,
+        sourceObject: String,
+        object: [String: Any],
+        queryParameters: [String: String]? = nil
+    ) async throws -> GoogleCloudStorageObject {
         var queryParams = ""
         if let queryParameters = queryParameters {
             queryParams = queryParameters.queryParameters
         }
         
-        do {
-            let requestBody = try JSONSerialization.data(withJSONObject: object)
-            return request.send(method: .POST, path: "\(endpoint)/\(sourceBucket)/o/\(sourceObject)/copyTo/b/\(destinationBucket)/o/\(destinationObject)", query: queryParams, body: .data(requestBody))
-        } catch {
-            return request.eventLoop.makeFailedFuture(error)
-        }
+        let requestBody = try JSONSerialization.data(withJSONObject: object)
+        return try await request.send(method: .POST,
+                                      path: "\(endpoint)/\(sourceBucket)/o/\(sourceObject)/copyTo/b/\(destinationBucket)/o/\(destinationObject)",
+                                      query: queryParams,
+                                      body: .bytes(.init(data: requestBody)))
     }
     
-    public func delete(bucket: String, object: String, queryParameters: [String: String]?) -> EventLoopFuture<EmptyResponse> {
+    public func delete(
+        bucket: String,
+        object: String,
+        queryParameters: [String: String]? = nil
+    ) async throws -> EmptyResponse {
         var queryParams = ""
         if let queryParameters = queryParameters {
             queryParams = queryParameters.queryParameters
         }
         
-        return request.send(method: .DELETE, path: "\(endpoint)/\(bucket)/o/\(object)", query: queryParams)
+        return try await request.send(method: .DELETE, path: "\(endpoint)/\(bucket)/o/\(object)", query: queryParams)
     }
     
-    public func get(bucket: String, object: String, queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageObject> {
+    public func get(
+        bucket: String,
+        object: String,
+        queryParameters: [String: String]? = nil
+    ) async throws -> GoogleCloudStorageObject {
         var queryParams = ""
         if let queryParameters = queryParameters {
             queryParams = queryParameters.queryParameters
         }
         
-        return request.send(method: .GET, path: "\(endpoint)/\(bucket)/o/\(object)", query: queryParams)
+        return try await request.send(method: .GET, path: "\(endpoint)/\(bucket)/o/\(object)", query: queryParams)
     }
 
-    public func getMedia(bucket: String, object: String, range: ClosedRange<Int>?, queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorgeDataResponse> {
+    public func getMedia(
+        bucket: String,
+        object: String,
+        range: ClosedRange<Int>? = nil,
+        queryParameters: [String: String]? = nil
+    ) async throws -> GoogleCloudStorgeDataResponse {
         var queryParams = ""
         if var queryParameters = queryParameters {
             queryParameters["alt"] = "media"
@@ -394,14 +474,17 @@ public final class GoogleCloudStorageObjectAPI: StorageObjectAPI {
             headers.add(name: "Range", value: "bytes=\(range.lowerBound)-\(range.upperBound)")
         }
         
-        return request.send(method: .GET, headers: headers, path: "\(endpoint)/\(bucket)/o/\(object)", query: queryParams)
+        return try await request.send(method: .GET, headers: headers, path: "\(endpoint)/\(bucket)/o/\(object)", query: queryParams)
     }
     
-    public func createSimpleUpload(bucket: String,
-                                   body: HTTPClient.Body,
-                                   name: String,
-                                   contentType: String,
-                                   queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageObject> {
+    public func createSimpleUpload(
+        bucket: String,
+        body: HTTPClientRequest.Body,
+        name: String,
+        contentType: String,
+        queryParameters: [String: String]? = nil
+    ) async throws -> GoogleCloudStorageObject {
+                
         var queryParams = ""
         if var queryParameters = queryParameters {
             queryParameters["name"] = name
@@ -411,75 +494,105 @@ public final class GoogleCloudStorageObjectAPI: StorageObjectAPI {
             queryParams = "uploadType=media&name=\(name)"
         }
         
-        var headers: HTTPHeaders = ["Content-Type": contentType]
+        let headers: HTTPHeaders = ["Content-Type": contentType,
+                                    "transfer-encoding": "chunked"]
         
-        if body.length == nil {
-            headers.add(name: "Transfer-Encoding", value: "chunked")
-        }
-        
-        return request.send(method: .POST, headers: headers, path: "\(uploadEndpoint)/\(bucket)/o", query: queryParams, body: body)
+        return try await request.send(method: .POST,
+                                      headers: headers,
+                                      path: "\(uploadEndpoint)/\(bucket)/o",
+                                      query: queryParams,
+                                      body: body)
     }
     
-    public func list(bucket: String, queryParameters: [String: String]?) -> EventLoopFuture<StorageObjectList> {
+    public func createSimpleUpload(
+        bucket: String,
+        data: Data,
+        name: String,
+        contentType: String,
+        queryParameters: [String: String]? = nil
+    ) async throws -> GoogleCloudStorageObject {
+        var queryParams = ""
+        if var queryParameters = queryParameters {
+            queryParameters["name"] = name
+            queryParameters["uploadType"] = "media"
+            queryParams = queryParameters.queryParameters
+        } else {
+            queryParams = "uploadType=media&name=\(name)"
+        }
+        
+        let headers: HTTPHeaders = ["Content-Type": contentType]
+                
+        return try await request.send(method: .POST,
+                                      headers: headers,
+                                      path: "\(uploadEndpoint)/\(bucket)/o",
+                                      query: queryParams,
+                                      body: .bytes(.init(data: data)))
+    }
+    
+    public func list(
+        bucket: String,
+        queryParameters: [String: String]? = nil
+    ) async throws -> StorageObjectList {
         var queryParams = ""
         if let queryParameters = queryParameters {
             queryParams = queryParameters.queryParameters
         }
         
-        return request.send(method: .GET, path: "\(endpoint)/\(bucket)/o", query: queryParams)
+        return try await request.send(method: .GET, path: "\(endpoint)/\(bucket)/o", query: queryParams)
     }
     
-    public func patch(bucket: String,
-                      object: String,
-                      metadata: [String: Any],
-                      queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageObject> {
+    public func patch(
+        bucket: String,
+        object: String,
+        metadata: [String: Any],
+        queryParameters: [String: String]? = nil
+    ) async throws -> GoogleCloudStorageObject {
         var queryParams = ""
         if let queryParameters = queryParameters {
             queryParams = queryParameters.queryParameters
         }
         
-        do {
-            let requestBody = try JSONSerialization.data(withJSONObject: metadata)
-            return request.send(method: .PATCH, path: "\(endpoint)/\(bucket)/o", query: queryParams, body: .data(requestBody))
-        } catch {
-            return request.eventLoop.makeFailedFuture(error)
-        }
+        let requestBody = try JSONSerialization.data(withJSONObject: metadata)
+        return try await request.send(method: .PATCH,
+                                      path: "\(endpoint)/\(bucket)/o",
+                                      query: queryParams,
+                                      body: .bytes(.init(data: requestBody)))
     }
     
-    public func rewrite(destinationBucket: String,
-                        destinationObject: String,
-                        sourceBucket: String,
-                        sourceObject: String,
-                        metadata: [String: Any],
-                        queryParameters: [String: String]?) -> EventLoopFuture<StorageRewriteObject> {
+    public func rewrite(
+        destinationBucket: String,
+        destinationObject: String,
+        sourceBucket: String,
+        sourceObject: String,
+        metadata: [String: Any],
+        queryParameters: [String: String]? = nil
+    ) async throws -> StorageRewriteObject {
         var queryParams = ""
         if let queryParameters = queryParameters {
             queryParams = queryParameters.queryParameters
         }
         
-        do {
-            let requestBody = try JSONSerialization.data(withJSONObject: metadata)
-            return request.send(method: .POST,
-                                path: "\(endpoint)/\(sourceBucket)/o/\(sourceObject)/rewriteTo/b/\(destinationBucket)/o/\(destinationObject)",
-                                query: queryParams,
-                                body: .data(requestBody))
-        } catch {
-            return request.eventLoop.makeFailedFuture(error)
-        }
+        let requestBody = try JSONSerialization.data(withJSONObject: metadata)
+        return try await request.send(method: .POST,
+                                      path: "\(endpoint)/\(sourceBucket)/o/\(sourceObject)/rewriteTo/b/\(destinationBucket)/o/\(destinationObject)",
+                                      query: queryParams,
+                                      body: .bytes(.init(data: requestBody)))
     }
     
-    public func update(bucket: String,
-                       object: String,
-                       acl: [[String: Any]],
-                       cacheControl: String?,
-                       contentDisposition: String?,
-                       contentEncoding: String?,
-                       contentLanguage: String?,
-                       contentType: String?,
-                       eventBasedHold: Bool?,
-                       metadata: [String: String]?,
-                       temporaryHold: Bool?,
-                       queryParameters: [String: String]?) -> EventLoopFuture<GoogleCloudStorageObject> {
+    public func update(
+        bucket: String,
+        object: String,
+        acl: [[String: Any]],
+        cacheControl: String?,
+        contentDisposition: String?,
+        contentEncoding: String?,
+        contentLanguage: String?,
+        contentType: String?,
+        eventBasedHold: Bool?,
+        metadata: [String: String]?,
+        temporaryHold: Bool?,
+        queryParameters: [String: String]?
+    ) async throws -> GoogleCloudStorageObject {
         var queryParams = ""
         if let queryParameters = queryParameters {
             queryParams = queryParameters.queryParameters
@@ -519,25 +632,27 @@ public final class GoogleCloudStorageObjectAPI: StorageObjectAPI {
             body["temporaryHold"] = temporaryHold
         }
         
-        do {
-            let requestBody = try JSONSerialization.data(withJSONObject: body)
-            return request.send(method: .PUT, path: "\(endpoint)/\(bucket)/o/\(object)", query: queryParams, body: .data(requestBody))
-        } catch {
-            return request.eventLoop.makeFailedFuture(error)
-        }
+        let requestBody = try JSONSerialization.data(withJSONObject: body)
+        return try await request.send(method: .PUT,
+                                      path: "\(endpoint)/\(bucket)/o/\(object)",
+                                      query: queryParams,
+                                      body: .bytes(.init(data: requestBody)))
     }
-    public func watchAll(bucket: String,
-                         kind: String,
-                         id: String,
-                         resourceId: String,
-                         resourceUri: String,
-                         token: String?,
-                         expiration: Date?,
-                         type: String,
-                         address: String,
-                         params: [String: String]?,
-                         payload: Bool?,
-                         queryParameters: [String: String]?) -> EventLoopFuture<StorageNotificationChannel> {
+    
+    public func watchAll(
+        bucket: String,
+        kind: String,
+        id: String,
+        resourceId: String,
+        resourceUri: String,
+        token: String?,
+        expiration: Date?,
+        type: String,
+        address: String,
+        params: [String: String]?,
+        payload: Bool?,
+        queryParameters: [String: String]?
+    ) async throws -> StorageNotificationChannel {
         var queryParams = ""
         if let queryParameters = queryParameters {
             queryParams = queryParameters.queryParameters
@@ -566,11 +681,10 @@ public final class GoogleCloudStorageObjectAPI: StorageObjectAPI {
             body["payload"] = payload
         }
         
-        do {
-            let requestBody = try JSONSerialization.data(withJSONObject: body)
-            return request.send(method: .POST, path: "\(endpoint)/\(bucket)/o/watch", query: queryParams, body: .data(requestBody))
-        } catch {
-            return request.eventLoop.makeFailedFuture(error)
-        }
+        let requestBody = try JSONSerialization.data(withJSONObject: body)
+        return try await request.send(method: .POST,
+                                      path: "\(endpoint)/\(bucket)/o/watch",
+                                      query: queryParams,
+                                      body: .bytes(.init(data: requestBody)))
     }
 }

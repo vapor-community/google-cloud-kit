@@ -10,7 +10,7 @@ import Foundation
 import AsyncHTTPClient
 import NIO
 
-public final class GoogleCloudStorageClient {
+public struct GoogleCloudStorageClient {
     public var bucketAccessControl: BucketAccessControlAPI
     public var buckets: StorageBucketAPI
     public var channels: ChannelsAPI
@@ -18,53 +18,39 @@ public final class GoogleCloudStorageClient {
     public var objectAccessControl: ObjectAccessControlsAPI
     public var notifications: StorageNotificationsAPI
     public var object: StorageObjectAPI
-    var storageRequest: GoogleCloudStorageRequest
-    
-    /// Initialize a client for interacting with the Google Cloud Storage API
-    /// - Parameter credentials: The Credentials to use when authenticating with the APIs
-    /// - Parameter storageConfig: The storage configuration for the Cloud Storage API
-    /// - Parameter httpClient: An `HTTPClient` used for making API requests.
-    /// - Parameter eventLoop: The EventLoop used to perform the work on.
-    public init(credentials: GoogleCloudCredentialsConfiguration,
-                storageConfig: GoogleCloudStorageConfiguration,
-                httpClient: HTTPClient,
-                eventLoop: EventLoop) throws {
-        /// A token implementing `OAuthRefreshable`. Loaded from credentials specified by `GoogleCloudCredentialsConfiguration`.
-        let refreshableToken = OAuthCredentialLoader.getRefreshableToken(credentials: credentials,
-                                                                         withConfig: storageConfig,
-                                                                         andClient: httpClient,
-                                                                         eventLoop: eventLoop)
 
-        /// Set the projectId to use for this client. In order of priority:
-        /// - Environment Variable (PROJECT_ID)
-        /// - Service Account's projectID
-        /// - `GoogleCloudStorageConfigurations` `project` property (optionally configured).
-        /// - `GoogleCloudCredentialsConfiguration's` `project` property (optionally configured).
+    let cloudStorageRequest: GoogleCloudStorageRequest
+    
+    public init(strategy: CredentialsLoadingStrategy, client: HTTPClient) async throws {
+        let resolvedCredentials = try await CredentialsResolver.resolveCredentials(strategy: strategy)
         
-        guard let projectId = ProcessInfo.processInfo.environment["PROJECT_ID"] ?? //GOOGLE_PROJECT_ID
-                                (refreshableToken as? OAuthServiceAccount)?.credentials.projectId ??
-                                storageConfig.project ?? credentials.project else {
-            throw GoogleCloudStorageError.projectIdMissing
+        switch resolvedCredentials {
+        case .gcloud(let gCloudCredentials):
+            let provider = GCloudCredentialsProvider(client: client, credentials: gCloudCredentials)
+            cloudStorageRequest = .init(tokenProvider: provider, client: client, project: gCloudCredentials.quotaProjectId)
+            
+        case .serviceAccount(let serviceAccountCredentials):
+            let provider = ServiceAccountCredentialsProvider(client: client, credentials: serviceAccountCredentials)
+            cloudStorageRequest = .init(tokenProvider: provider, client: client, project: serviceAccountCredentials.projectId)
+            
+        case .computeEngine(let metadataUrl):
+            let projectId = ProcessInfo.processInfo.environment["PROJECT_ID"] ?? "default"
+            switch strategy {
+            case .computeEngine(let client, let scope):
+                let provider = ComputeEngineCredentialsProvider(client: client, scopes: scope, url: metadataUrl)
+                cloudStorageRequest = .init(tokenProvider: provider, client: client, project: projectId)
+            default:
+                let provider = ComputeEngineCredentialsProvider(client: client, scopes: [], url: metadataUrl)
+                cloudStorageRequest = .init(tokenProvider: provider, client: client, project: projectId)
+            }
         }
-
-        storageRequest = GoogleCloudStorageRequest(httpClient: httpClient,
-                                                   eventLoop: eventLoop,
-                                                   oauth: refreshableToken,
-                                                   project: projectId)
-
-        bucketAccessControl = GoogleCloudStorageBucketAccessControlAPI(request: storageRequest)
-        buckets = GoogleCloudStorageBucketAPI(request: storageRequest)
-        channels = GoogleCloudStorageChannelsAPI(request: storageRequest)
-        defaultObjectAccessControl = GoogleCloudStorageDefaultObjectACLAPI(request: storageRequest)
-        objectAccessControl = GoogleCloudStorageObjectAccessControlsAPI(request: storageRequest)
-        notifications = GoogleCloudStorageNotificationsAPI(request: storageRequest)
-        object = GoogleCloudStorageObjectAPI(request: storageRequest)
-    }
-    
-    /// Hop to a new eventloop to execute requests on.
-    /// - Parameter eventLoop: The eventloop to execute requests on.
-    public func hopped(to eventLoop: EventLoop) -> GoogleCloudStorageClient {
-        storageRequest.eventLoop = eventLoop
-        return self
+        
+        bucketAccessControl = GoogleCloudStorageBucketAccessControlAPI(request: cloudStorageRequest)
+        buckets = GoogleCloudStorageBucketAPI(request: cloudStorageRequest)
+        channels = GoogleCloudStorageChannelsAPI(request: cloudStorageRequest)
+        defaultObjectAccessControl = GoogleCloudStorageDefaultObjectACLAPI(request: cloudStorageRequest)
+        objectAccessControl = GoogleCloudStorageObjectAccessControlsAPI(request: cloudStorageRequest)
+        notifications = GoogleCloudStorageNotificationsAPI(request: cloudStorageRequest)
+        object = GoogleCloudStorageObjectAPI(request: cloudStorageRequest)
     }
 }

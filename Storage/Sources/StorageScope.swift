@@ -1,5 +1,5 @@
 //
-//  GoogleCloudStorageConfiguration.swift
+//  StorageScope.swift
 //  GoogleCloudKit
 //
 //  Created by Andrew Edwards on 4/21/18.
@@ -8,27 +8,7 @@
 import Core
 import Foundation
 
-public struct GoogleCloudStorageConfiguration: GoogleCloudAPIConfiguration {
-    public var scope: [GoogleCloudAPIScope]
-    public let serviceAccount: String
-    public let project: String?
-    public let subscription: String? = nil
-    
-    public init(scope: [GoogleCloudStorageScope], serviceAccount: String, project: String?) {
-        self.scope = scope
-        self.serviceAccount = serviceAccount
-        self.project = project
-    }
-    
-    /// Create a new `GoogleCloudStorageConfig` with full control scope and the default service account.
-    public static func `default`() -> GoogleCloudStorageConfiguration {
-        return GoogleCloudStorageConfiguration(scope: [.fullControl],
-                                               serviceAccount: "default",
-                                               project: nil)
-    }
-}
-
-public enum GoogleCloudStorageScope: GoogleCloudAPIScope {
+public enum GoogleCloudStorageScope: GoogleCloudAPIScope, CaseIterable {
     /// Only allows access to read data, including listing buckets.
     case readOnly
     /// Allows access to read and change data, but not metadata like IAM policies.

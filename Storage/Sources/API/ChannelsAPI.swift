@@ -15,12 +15,16 @@ public protocol ChannelsAPI {
     /// - Parameter id: A UUID or similar unique string that identifies this channel.
     /// - Parameter resourceId: An opaque ID that identifies the resource being watched on this channel. Stable across different API versions.
     /// - Parameter queryParameters: Optional query parameters
-    func stop(id: String, resourceId: String, queryParameters: [String: String]?) -> EventLoopFuture<EmptyResponse>
+    func stop(id: String, resourceId: String, queryParameters: [String: String]?) async throws -> EmptyResponse
 }
 
 extension ChannelsAPI {
-    public func stop(id: String, resourceId: String, queryParameters: [String: String]? = nil) -> EventLoopFuture<EmptyResponse> {
-        return stop(id: id, resourceId: resourceId, queryParameters: queryParameters)
+    public func stop(
+        id: String,
+        resourceId: String,
+        queryParameters: [String: String]? = nil
+    ) async throws -> EmptyResponse {
+        try await stop(id: id, resourceId: resourceId, queryParameters: queryParameters)
     }
 }
 
@@ -32,19 +36,21 @@ public final class GoogleCloudStorageChannelsAPI: ChannelsAPI {
         self.request = request
     }
     
-    public func stop(id: String, resourceId: String, queryParameters: [String: String]?) -> EventLoopFuture<EmptyResponse> {
+    public func stop(
+        id: String,
+        resourceId: String,
+        queryParameters: [String: String]?
+    ) async throws -> EmptyResponse {
         var queryParams = ""
         if let queryParameters = queryParameters {
             queryParams = queryParameters.queryParameters
         }
         
-        do {
-            let body: [String: Any] = ["id": id, "resourceid": resourceId]
-            let requestBody = try JSONSerialization.data(withJSONObject: body)
-            return request.send(method: .POST, path: "\(endpoint)/stop)", query: queryParams, body: .data(requestBody))
-        } catch {
-            return request.eventLoop.makeFailedFuture(error)
-        }
+        let body: [String: Any] = ["id": id, "resourceid": resourceId]
+        let requestBody = try JSONSerialization.data(withJSONObject: body)
+        return try await request.send(method: .POST,
+                                      path: "\(endpoint)/stop)",
+                                      query: queryParams,
+                                      body: .bytes(.init(data: requestBody)))
     }
 }
-
