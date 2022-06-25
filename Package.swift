@@ -10,7 +10,8 @@ let package = Package(
             name: "GoogleCloudKit",
             targets: ["Core",
                       "SecretManager",
-                      "Translation"] //"Storage", "Datastore", "PubSub"
+                      "Translation",
+                      "Storage"] //, "Datastore", "PubSub"
         ),
         .library(
             name: "GoogleCloudCore",
