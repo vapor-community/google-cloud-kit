@@ -8,6 +8,7 @@
 import Foundation
 import AsyncHTTPClient
 import NIO
+import NIOFoundationCompat
 
 public actor ComputeEngineCredentialsProvider: AccessTokenProvider {
     static let metadataServerUrl = "http://metadata.google.internal"
@@ -49,7 +50,7 @@ public actor ComputeEngineCredentialsProvider: AccessTokenProvider {
     @discardableResult
     private func refresh() async throws -> String {
         let response = try await client.execute(buildRequest(), timeout: .seconds(10))
-        let body = try await response.body.collect(upTo: 1024 * 1024) // 1mb
+        let body = Data(buffer: try await response.body.collect(upTo: 1024 * 1024)) // 1mb
         guard response.status == .ok else {
             throw try decoder.decode(GoogleCloudOAuthError.self, from: body)
         }
