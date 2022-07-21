@@ -18,4 +18,6 @@ public enum CredentialsLoadingStrategy {
     ///
     /// You should use this if the client runs on a Google virtual machine instance such as Compute Engine.
     case computeEngine(client: HTTPClient, scope: [GoogleCloudAPIScope])
+    /// Loads the credentials as JSON from environment variables as opposed to a file path on disk.
+    case environmentJSON
 }

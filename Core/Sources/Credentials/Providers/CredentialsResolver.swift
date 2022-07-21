@@ -46,6 +46,25 @@ public struct CredentialsResolver {
                 }
             }
             
+        case .environmentJSON:
+            // try to load the raw JSON that's storted in the environment variable
+            guard let content = (env["GOOGLE_APPLICATION_CREDENTIALS"] ?? "").data(using: .utf8) else {
+                throw CredentialLoadError.jsonLoadError
+            }
+            
+            let decoder = JSONDecoder()
+            decoder.keyDecodingStrategy = .convertFromSnakeCase
+            
+            do {
+                return try .gcloud(decoder.decode(GCloudCredentials.self, from: content))
+            } catch DecodingError.keyNotFound(_, _) {
+                do {
+                    return try .serviceAccount(decoder.decode(ServiceAccountCredentials.self, from: content))
+                } catch {
+                    throw CredentialLoadError.jsonLoadError
+                }
+            }
+            
         case .computeEngine(let client, _):
             // check if we're allowed to check for GCE environment
             guard (env["NO_GCE_CHECK"] ?? "false").lowercased() == "false" else {

@@ -10,12 +10,16 @@ import NIOHTTP1
 public protocol GoogleCloudError: Error {}
 
 public enum CredentialLoadError: GoogleCloudError {
+    case jsonLoadError
     case fileLoadError(String)
     case computeEngineCheckNotAvailable
     case computeEngineNotAvailable
     
     var localizedDescription: String {
         switch self {
+        case .jsonLoadError:
+            return "Failed to load the JSON from the GOOGLE_APPLICATION_CREDENTIALS env variable."
+            
         case .fileLoadError(let path):
             return "Failed to load GoogleCloud credentials from the file path \(path)"
             
