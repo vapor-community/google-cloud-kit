@@ -44,7 +44,7 @@ Now setup the configuration.
 Optionally, you can register an empty `GoogleCloudCredentialsConfiguration()` and configure the following environment variables:
 
 ```shell
-export PROJECT_ID=myprojectid-12345
+export GOOGLE_PROJECT_ID=myprojectid-12345
 export GOOGLE_APPLICATION_CREDENTIALS=/path/to/your/service-account.json
 ```
 

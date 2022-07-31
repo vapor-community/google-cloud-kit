@@ -33,6 +33,7 @@ let gcs = try GoogleCloudDatastoreClient(credentials: credentialsConfiguration,
 
 ```
 The order of priority for which configured projectID the DatastoreClient will use is as follows:
+1. `$GOOGLE_PROJECT_ID` environment variable.
 1. `$PROJECT_ID` environment variable.
 2. The Service Accounts projectID (Service account configured via the credentials path in the credentials configuration).
 3. `GoogleCloudDatastoreConfiguration`'s `project` property.
