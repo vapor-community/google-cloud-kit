@@ -21,7 +21,9 @@ public struct GoogleCloudStorageClient {
 
     let cloudStorageRequest: GoogleCloudStorageRequest
     
-    public init(strategy: CredentialsLoadingStrategy, client: HTTPClient) async throws {
+    public init(strategy: CredentialsLoadingStrategy,
+                client: HTTPClient,
+                scope: [GoogleCloudStorageScope]) async throws {
         let resolvedCredentials = try await CredentialsResolver.resolveCredentials(strategy: strategy)
         
         switch resolvedCredentials {
@@ -30,17 +32,19 @@ public struct GoogleCloudStorageClient {
             cloudStorageRequest = .init(tokenProvider: provider, client: client, project: gCloudCredentials.quotaProjectId)
             
         case .serviceAccount(let serviceAccountCredentials):
-            let provider = ServiceAccountCredentialsProvider(client: client, credentials: serviceAccountCredentials)
+            let provider = ServiceAccountCredentialsProvider(client: client,
+                                                             credentials: serviceAccountCredentials,
+                                                             scope: scope)
             cloudStorageRequest = .init(tokenProvider: provider, client: client, project: serviceAccountCredentials.projectId)
             
         case .computeEngine(let metadataUrl):
             let projectId = ProcessInfo.processInfo.environment["PROJECT_ID"] ?? "default"
             switch strategy {
-            case .computeEngine(let client, let scope):
+            case .computeEngine(let client):
                 let provider = ComputeEngineCredentialsProvider(client: client, scopes: scope, url: metadataUrl)
                 cloudStorageRequest = .init(tokenProvider: provider, client: client, project: projectId)
             default:
-                let provider = ComputeEngineCredentialsProvider(client: client, scopes: [], url: metadataUrl)
+                let provider = ComputeEngineCredentialsProvider(client: client, scopes: scope, url: metadataUrl)
                 cloudStorageRequest = .init(tokenProvider: provider, client: client, project: projectId)
             }
         }

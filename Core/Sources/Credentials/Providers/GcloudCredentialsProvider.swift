@@ -63,7 +63,8 @@ public actor GCloudCredentialsProvider: AccessTokenProvider {
     }
 }
 
-/// The gcloud default credentials generated via command ‘gcloud auth application-default login’.
+/// The `gcloud` default credentials generated via command `‘gcloud auth application-default login’`.
+/// These credentials are for an existing user and the type will be an `authorized_user`
 public struct GCloudCredentials: Codable {
     public let clientId: String
     public let clientSecret: String

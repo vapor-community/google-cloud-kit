@@ -65,7 +65,7 @@ public struct CredentialsResolver {
                 }
             }
             
-        case .computeEngine(let client, _):
+        case .computeEngine(let client):
             // check if we're allowed to check for GCE environment
             guard (env["NO_GCE_CHECK"] ?? "false").lowercased() == "false" else {
                 throw CredentialLoadError.computeEngineCheckNotAvailable
