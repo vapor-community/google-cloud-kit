@@ -1,10 +1,13 @@
-// swift-tools-version:5.2
+// swift-tools-version:5.7
 
 import PackageDescription
 
 let package = Package(
     name: "google-cloud-kit",
-    platforms: [ .macOS(.v10_15)],
+    platforms: [
+        .macOS(.v13),
+        .iOS(.v13)
+    ],
     products: [
         .library(
             name: "GoogleCloudKit",
@@ -36,8 +39,8 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/swift-server/async-http-client.git", from: "1.2.0"),
-        .package(url: "https://github.com/vapor/jwt-kit.git", from: "4.0.0")
+        .package(url: "https://github.com/swift-server/async-http-client.git", from: "1.18.0"),
+        .package(url: "https://github.com/vapor/jwt-kit.git", from: "4.13.0")
     ],
     targets: [
         .target(
