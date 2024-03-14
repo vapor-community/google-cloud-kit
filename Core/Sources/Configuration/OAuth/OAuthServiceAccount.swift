@@ -31,40 +31,44 @@ public class OAuthServiceAccount: OAuthRefreshable {
 
     // Google Documentation for this approach: https://developers.google.com/identity/protocols/OAuth2ServiceAccount
     public func refresh() -> EventLoopFuture<OAuthAccessToken> {
-        do {
-            let headers: HTTPHeaders = ["Content-Type": "application/x-www-form-urlencoded"]
-            let token = try generateJWT()
+        let headers: HTTPHeaders = ["Content-Type": "application/x-www-form-urlencoded"]
+ 
+        return generateJWT(on: self.eventLoop).flatMapThrowing { (token: String) -> HTTPClient.Request in
             let body: HTTPClient.Body = .string("grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=\(token)"
-                                        .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")
-            let request = try HTTPClient.Request(url: GoogleOAuthTokenUrl, method: .POST, headers: headers, body: body)
+                .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")
             
-            return httpClient.execute(request: request, eventLoop: .delegate(on: self.eventLoop)).flatMap { response in
-                
-                guard var byteBuffer = response.body,
-                let responseData = byteBuffer.readData(length: byteBuffer.readableBytes),
-                response.status == .ok else {
-                    return self.eventLoop.makeFailedFuture(OauthRefreshError.noResponse(response.status))
-                }
-                
-                do {
-                    return self.eventLoop.makeSucceededFuture(try self.decoder.decode(OAuthAccessToken.self, from: responseData))
-                } catch {
-                    return self.eventLoop.makeFailedFuture(error)
-                }
+            return try HTTPClient.Request(url: GoogleOAuthTokenUrl, method: .POST, headers: headers, body: body)
+        }.flatMap { request in
+            return self.httpClient.execute(request: request, eventLoop: .delegate(on: self.eventLoop))
+        }.flatMap { (response: HTTPClient.Response) in
+            guard var byteBuffer = response.body,
+            let responseData = byteBuffer.readData(length: byteBuffer.readableBytes),
+            response.status == .ok else {
+                return self.eventLoop.makeFailedFuture(OauthRefreshError.noResponse(response.status))
             }
             
-        } catch {
-            return self.eventLoop.makeFailedFuture(error)
+            do {
+                return self.eventLoop.makeSucceededFuture(try self.decoder.decode(OAuthAccessToken.self, from: responseData))
+            } catch {
+                return self.eventLoop.makeFailedFuture(error)
+            }
         }
     }
 
-    private func generateJWT() throws -> String {
+    private func generateJWT(on eventLoop: EventLoop) -> EventLoopFuture<String> {
         let payload = OAuthPayload(iss: IssuerClaim(value: credentials.clientEmail),
                                    scope: scope,
                                    aud: AudienceClaim(value: GoogleOAuthTokenAudience),
                                    exp: ExpirationClaim(value: Date().addingTimeInterval(3600)),
                                    iat: IssuedAtClaim(value: Date()), sub: subscription)
-        let privateKey = try RSAKey.private(pem: credentials.privateKey.data(using: .utf8, allowLossyConversion: true) ?? Data())
-        return try JWTSigner.rs256(key: privateKey).sign(payload)
+        
+        let privateKey: Insecure.RSA.PrivateKey
+        do {
+            privateKey = try Insecure.RSA.PrivateKey(pem: credentials.privateKey.data(using: .utf8, allowLossyConversion: true) ?? Data())
+        } catch {
+            return eventLoop.makeFailedFuture(error)
+        }
+        
+        return eventLoop.makeFutureWithTask { try await JWTKeyCollection().addRS256(key: privateKey).sign(payload) }
     }
 }
