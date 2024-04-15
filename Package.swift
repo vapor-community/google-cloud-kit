@@ -11,7 +11,14 @@ let package = Package(
     products: [
         .library(
             name: "GoogleCloudKit",
-            targets: ["Core", "Storage", "Datastore", "SecretManager", "PubSub"]
+            targets: [
+                "Core",
+                "Datastore",
+                "IAMServiceAccountCredentials",
+                "PubSub",
+                "SecretManager",
+                "Storage",
+            ]
         ),
         .library(
             name: "GoogleCloudCore",
@@ -28,6 +35,10 @@ let package = Package(
         .library(
             name: "GoogleCloudSecretManager",
             targets: ["SecretManager"]
+        ),
+        .library(
+            name: "GoogleCloudIAMServiceAccountCredentials",
+            targets: ["IAMServiceAccountCredentials"]
         ),
         .library(
             name: "GoogleCloudTranslation",
@@ -71,6 +82,13 @@ let package = Package(
                 .target(name: "Core")
             ],
             path: "SecretManager/Sources"
+        ),
+        .target(
+            name: "IAMServiceAccountCredentials",
+            dependencies: [
+                .target(name: "Core")
+            ],
+            path: "IAMServiceAccountCredentials/Sources"
         ),
         .target(
             name: "Translation",
