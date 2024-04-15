@@ -59,3 +59,4 @@ export GOOGLE_APPLICATION_CREDENTIALS=[Valid Pasted JSON]
 * [x] Datastore [Setup guide](https://github.com/vapor-community/GoogleCloudKit/tree/master/Datastore/Sources/README.md)
 * [x] SecretManager [Setup Guide](https://github.com/vapor-community/google-cloud-kit/tree/master/SecretManager/Sources/README.md)
 * [x] Translation [Setup Guide](https://github.com/vapor-community/google-cloud-kit/tree/master/Translation/Sources/README.md)
+* [x] IAM Service Account Credentials [Setup Guide](https://github.com/vapor-community/google-cloud-kit/tree/master/IAMServiceAccountCredentials/Sources/README.md)
