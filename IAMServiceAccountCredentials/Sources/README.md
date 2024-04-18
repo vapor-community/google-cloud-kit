@@ -25,8 +25,8 @@ let iamServiceAccountCredentialsConfiguration = IAMServiceAccountCredentialsConf
 
 ### Now create an `IAMServiceAccountCredentialsClient` with the configuration and an `HTTPClient`
 ```swift
-let let client = HTTPClient(...)
-let smc = try IAMServiceAccountCredentialsClient(credentials: credentialsConfiguration,
+let client = HTTPClient(...)
+let iamClient = try IAMServiceAccountCredentialsClient(credentials: credentialsConfiguration,
                                        config: iamServiceAccountCredentialsConfiguration,
                                        httpClient: client,
                                        eventLoop: myEventLoop)
