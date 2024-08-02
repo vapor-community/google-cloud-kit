@@ -34,11 +34,34 @@ public protocol DatastoreProjectAPI {
     
     /// Queries for entities.
     /// - Parameters:
-    ///   - partitionId: Entities are partitioned into subsets, identified by a partition ID. Queries are scoped to a single partition. This partition ID is normalized with the standard default context partition ID.
+    ///   - partitionId: The (optional) namespace and partition against which to run the query
     ///   - readOptions: The options for this query.
     ///   - datastoreQuery: A query to run, either of normal or GQL type
     func runQuery(partitionId: PartitionId, readOptions: ReadOptions?, datastoreQuery: DatastoreQuery) -> EventLoopFuture<RunQueryResponse>
     
+    /// Runs a query and performs an aggregation (sum, count or average) on the results
+    /// - Parameters:
+    ///   - query: The query to run
+    ///   - aggregations: The aggregations to perform on the results of the given query
+    ///   - partitionId: The (optional) namespace and partition against which to run the query
+    ///   - readOptions: The options for this query
+    func runAggregationQuery(
+        query: Query,
+        aggregations: [Aggregation],
+        partitionId: PartitionId,
+        readOptions: ReadOptions?
+    ) -> EventLoopFuture<RunAggregationQueryResponse>
+    
+    /// Runs an aggregation query in GQL format
+    /// - Parameters:
+    ///   - gqlQuery: The aggregation query to run in GQL format
+    ///   - partitionId: The namespace and partition against which to run the query
+    ///   - readOptions: The options for this query
+    func runAggregationQuery(
+        gqlQuery: GqlQuery,
+        partitionId: PartitionId,
+        readOptions: ReadOptions?
+    ) -> EventLoopFuture<RunAggregationQueryResponse>
     
     /// Inserts an entity
     /// Convenience method equivalent to calling `commit(mode:mutations:)` with a single insert mutation
@@ -109,6 +132,32 @@ extension DatastoreProjectAPI {
    
     public func runQuery(partitionId: PartitionId, readOptions: ReadOptions? = nil, datastoreQuery: DatastoreQuery) -> EventLoopFuture<RunQueryResponse> {
         return runQuery(partitionId: partitionId, readOptions: readOptions, datastoreQuery: datastoreQuery)
+    }
+    
+    public func runAggregationQuery(
+        query: Query,
+        aggregations: [Aggregation],
+        partitionId: PartitionId,
+        readOptions: ReadOptions? = nil
+    ) -> EventLoopFuture<RunAggregationQueryResponse> {
+        return runAggregationQuery(
+            query: query,
+            aggregations: aggregations,
+            partitionId: partitionId,
+            readOptions: readOptions
+        )
+    }
+    
+    public func runAggregationQuery(
+        gqlQuery: GqlQuery,
+        partitionId: PartitionId,
+        readOptions: ReadOptions? = nil
+    ) -> EventLoopFuture<RunAggregationQueryResponse> {
+        return runAggregationQuery(
+            gqlQuery: gqlQuery,
+            partitionId: partitionId,
+            readOptions: readOptions
+        )
     }
     
     public func insert(_ entity: Entity) -> EventLoopFuture<CommitResponse> {
@@ -241,6 +290,56 @@ public final class GoogleCloudDatastoreProjectAPI: DatastoreProjectAPI {
             
             let body = try HTTPClient.Body.data(encoder.encode(runQueryRequest))
             return request.send(method: .POST, path: "\(projectPath):runQuery", body: body)
+        } catch {
+            return request.eventLoop.makeFailedFuture(error)
+        }
+    }
+    
+    public func runAggregationQuery(
+        query: Query,
+        aggregations: [Aggregation],
+        partitionId: PartitionId,
+        readOptions: ReadOptions? = nil
+    ) -> EventLoopFuture<RunAggregationQueryResponse> {
+        
+        let queryRequest = RunAggregationQueryRequest(
+            query: query,
+            aggregations: aggregations,
+            partitionId: partitionId,
+            readOptions: readOptions
+        )
+        
+        do {
+            let body = try HTTPClient.Body.data(encoder.encode(queryRequest))
+            return request.send(
+                method: .POST,
+                path: "\(projectPath):runAggregationQuery",
+                body: body
+            )
+        } catch {
+            return request.eventLoop.makeFailedFuture(error)
+        }
+    }
+    
+    public func runAggregationQuery(
+        gqlQuery: GqlQuery,
+        partitionId: PartitionId,
+        readOptions: ReadOptions? = nil
+    ) -> EventLoopFuture<RunAggregationQueryResponse> {
+        
+        let queryRequest = RunAggregationQueryRequest(
+            gqlQuery: gqlQuery,
+            partitionId: partitionId,
+            readOptions: readOptions
+        )
+        
+        do {
+            let body = try HTTPClient.Body.data(encoder.encode(queryRequest))
+            return request.send(
+                method: .POST,
+                path: "\(projectPath):runAggregationQuery",
+                body: body
+            )
         } catch {
             return request.eventLoop.makeFailedFuture(error)
         }
