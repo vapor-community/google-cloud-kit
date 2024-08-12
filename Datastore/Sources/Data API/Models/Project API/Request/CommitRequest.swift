@@ -2,9 +2,14 @@ import Core
 
 public struct CommitRequest: GoogleCloudModel {
     
-    public init(mode: Mode = .nonTransactional, mutations: [Mutation]) {
+    public init(
+        mode: Mode = .nonTransactional,
+        mutations: [Mutation],
+        databaseId: String? = nil
+    ) {
         self.mode = mode
         self.mutations = mutations
+        self.databaseId = databaseId
     }
     
     /// The type of commit to perform.
@@ -19,6 +24,9 @@ public struct CommitRequest: GoogleCloudModel {
     public let mutations: [Mutation]
     /// The identifier of the transaction associated with the commit.
     private var transaction: String?
+    /// The ID of the database against which to make the request.
+    /// '(default)' is not allowed; please use empty string '' to refer the default database.
+    public let databaseId: String?
         
     /// The modes available for commits.
     public enum Mode: GoogleCloudModel {
@@ -105,11 +113,14 @@ public struct CommitRequest: GoogleCloudModel {
         case mode
         case mutations
         case transaction
+        case databaseId
     }
     
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(mutations, forKey: .mutations)
+        try container.encodeIfPresent(databaseId, forKey: .databaseId)
+        try container.encodeIfPresent(transaction, forKey: .transaction)
         
         switch mode {
         case .transactional(let value):

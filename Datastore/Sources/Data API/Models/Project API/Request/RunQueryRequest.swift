@@ -6,12 +6,14 @@ public struct RunQueryRequest: GoogleCloudModel {
         gqlQuery: GqlQuery? = nil,
         partitionId: PartitionId? = nil,
         query: Query? = nil,
-        readOptions: ReadOptions? = nil
+        readOptions: ReadOptions? = nil,
+        databaseId: String? = nil
     ) {
         self.gqlQuery = gqlQuery
         self.partitionId = partitionId
         self.query = query
         self.readOptions = readOptions
+        self.databaseId = databaseId
     }
     
     /// The GQL query to run.
@@ -22,5 +24,8 @@ public struct RunQueryRequest: GoogleCloudModel {
     public let query: Query?
     /// The options for this query.
     public let readOptions: ReadOptions?
+    /// The ID of the database against which to make the request.
+    /// '(default)' is not allowed; please use empty string '' to refer the default database.
+    public let databaseId: String?
 }
 
