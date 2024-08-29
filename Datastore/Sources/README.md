@@ -25,8 +25,8 @@ let datastoreConfiguration = GoogleCloudDatastoreConfig.default()
 
 ### Now create a `GoogleCloudDatastoreClient` with the configuration and an `HTTPClient`
 ```swift
-let let client = HTTPClient(...)
-let gcs = try GoogleCloudDatastoreClient(credentials: credentialsConfiguration,
+let client = HTTPClient(...)
+let datastore = try GoogleCloudDatastoreClient(credentials: credentialsConfiguration,
                                        config: datastoreConfiguration,
                                        httpClient: client,
                                        eventLoop: myEventLoop)
@@ -41,57 +41,135 @@ The order of priority for which configured projectID the DatastoreClient will us
 
 Initializing the client will throw an error if no projectID is set anywhere.
 
-### Adding a new entity
+## Managing Entities
+
+### Add a new entity
 
 ```swift
-func createEntity() {
-    let datastore = try GoogleCloudDatastoreClient(credentials: credentialsConfiguration,
-                                           config: datastoreConfiguration,
-                                           httpClient: client,
-                                           eventLoop: myEventLoop)
-   
-   let pathElement = PathElement(.none, kind: "MyEntity")
-   let partitionId = PartitionId(projectId: "my-project")
-   let key = Key(partitionId: partitionId, path: [pathElement])
-                                           
-   let properties: [String: Value] = ["myKey": Value(.string("myValue"))]
-   let entity = Entity(key: key, properties: properties)
+let pathElement = PathElement(.none, kind: "MyEntity")
+let partitionId = PartitionId(projectId: "my-project")
+let key = Key(partitionId: partitionId, path: [pathElement])
+                                       
+let properties: [String: Value] = ["myKey": Value(.string("myValue"))]
+let entity = Entity(key: key, properties: properties)
 
-    datastore.project.insert(entity).map { response in
-        print(response.indexUpdates) // prints 1
-    }
+datastore.project.insert(entity).map { response in
+    print(response.indexUpdates) // prints 1
 }
 ```
 
-### Looking up an entity
+### Look up an entity
 
 ```swift
-func lookupObject(name: String) {
-    let datastore = try GoogleCloudDatastoreClient(credentials: credentialsConfiguration,
-                                           config: datastoreConfiguration,
-                                           httpClient: client,
-                                           eventLoop: myEventLoop)
+let pathElement = PathElement(.name("element-id"), kind: "MyEntity")
+let partitionId = PartitionId(projectId: "my-project")
+let key = Key(partitionId: partitionId, path: [pathElement])
 
-    let pathElement = PathElement(.name(name), kind: "MyEntity")
-    let partitionId = PartitionId(projectId: "my-project")
-    let key = Key(partitionId: partitionId, path: [pathElement])
-
-    datastore.project.lookup(keys: [key]).map { response in
-        print(response.found.count) // prints 1 if entity exists
-    }
+datastore.project.lookup(keys: [key]).map { response in
+    print(response.found.count) // prints 1 if entity exists
 }
 ```
 
-There are other API's available which are well [documented](https://cloud.google.com/datastore/docs/reference/data/rest).
-This is just a basic example of creating then looking up an entity.
+## Queries
 
-### What's implemented
+### Run query
 
-#### Data API
+```swift
+let filter = PropertyFilter(
+    property: "myProperty",
+    stringValue: "myValue"
+)
+
+let query = Query(
+    filter: .property(filter),
+    kind: [KindExpression("MyEntity")]
+)
+
+let partitionId = PartitionId(projectId: "my-project")
+                
+let response = try await datastore.project.runQuery(
+    datastoreQuery: .query(query),
+    partitionId: partitionId
+).get()
+
+// prints results
+print(response.batch.entityResults)
+```
+
+### Run query with GQL
+```swift
+// This query is equivalent to the one in the previous example but uses GQL                                        
+let query = GqlQuery(
+    allowLiterals: true,
+    namedBindings: nil,
+    positionalBindings: nil,
+    queryString: "SELECT * FROM MyEntity WHERE myProperty = \"myValue\""
+)
+
+let partitionId = PartitionId(projectId: "my-project")
+
+let response = try await req.gcDatastore.project.runQuery(
+    partitionId: partitionId,
+    datastoreQuery: .gqlQuery(query)
+).get()
+
+// prints results
+print(response.batch?.entityResults)
+```
+
+## Aggregation Queries
+
+### Run aggregation query
+
+```swift
+let filter = PropertyFilter(
+    property: "myProperty",
+    stringValue: "myValue"
+)
+
+let query = Query(
+    filter: .property(filter),
+    kind: [KindExpression("MyEntity")]
+)
+
+let partitionId = PartitionId(projectId: "my-project")
+                
+let response = try await datastore.project.runAggregationQuery(
+    query: query,
+    aggregations: [.count()],
+    partitionId: partitionId
+).get()
+
+// prints count
+print(response.batch.aggregationResults.first.aggregateProperties.values.first.integerValue)
+```
+
+### Run aggregation query with GQL
+
+```swift    
+// This query is equivalent to the one in the previous example but uses GQL                                        
+let gqlQuery = GqlQuery(
+    allowLiterals: true,
+    queryString: "AGGREGATE COUNT(*) OVER ( SELECT * FROM MyEntity WHERE myProperty = \"myValue\" )"
+)
+
+let partitionId = PartitionId(projectId: "my-project")
+
+let response = try await datastore.project.runAggregationQuery(
+    gqlQuery: gqlQuery,
+    partitionId: partitionId
+).get()
+```
+
+There are other APIs available which are well [documented](https://cloud.google.com/datastore/docs/reference/data/rest).
+
+## What's implemented
+
+### Data API
 * [x] projects
 * [ ] projects.operations
 
-#### Admin API
+### Admin API
 * [ ] projects
 * [ ] projects.indexes
 * [ ] projects.operations

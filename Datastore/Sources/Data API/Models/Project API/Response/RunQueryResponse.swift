@@ -1,8 +1,10 @@
 import Core
 
 public struct RunQueryResponse: GoogleCloudModel {
-    public init(batch: QueryResultBatch? = nil,
-                 query: Query? = nil) {
+    public init(
+        batch: QueryResultBatch? = nil,
+        query: Query? = nil
+    ) {
         self.batch = batch
         self.query = query
     }

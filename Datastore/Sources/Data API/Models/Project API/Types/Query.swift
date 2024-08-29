@@ -82,22 +82,32 @@ public struct CompositeFilter: GoogleCloudModel {
     /// The list of filters to combine. Must contain at least one filter.
     public let filters: [Filter]
     /// The operator for combining multiple filters.
-    public let op: Operator?
+    public let op: Operator
     
     /// A composite filter operator.
     public enum Operator: String, RawRepresentable, GoogleCloudModel {
         /// The results are required to satisfy each of the combined filters.
         case and = "AND"
+        /// Documents are required to satisfy at least one of the combined filters.
+        case or = "OR"
     }
     
-    public init(_ filters: [Filter]) {
-        self.init(filters: filters, op: .and)
-    }
-    
-    init(filters: [Filter],
-         op: Operator? = nil) {
+    public init(
+        filters: [Filter],
+        op: Operator = .and
+    ) {
         self.filters = filters
         self.op = op
+    }
+    
+    public init(
+        filters: [Filter.TypedFilter],
+        op: Operator = .and
+    ) {
+        self.init(
+            filters: filters.map(Filter.init),
+            op: op
+        )
     }
 }
 

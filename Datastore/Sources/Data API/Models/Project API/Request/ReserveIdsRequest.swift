@@ -1,8 +1,10 @@
 import Core
 
 public struct ReserveIdsRequest: GoogleCloudModel {
-    public init(databaseId: String? = nil,
-                 keys: [Key]) {
+    public init(
+        databaseId: String? = nil,
+        keys: [Key]
+    ) {
         self.databaseId = databaseId
         self.keys = keys
     }
