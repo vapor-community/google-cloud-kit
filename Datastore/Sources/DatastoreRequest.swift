@@ -21,8 +21,8 @@ class GoogleCloudDatastoreRequest: GoogleCloudAPIRequest {
         self.project = project
         self.eventLoop = eventLoop
         let dateFormatter = DateFormatter()
-
-        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        dateFormatter.calendar = Calendar(identifier: .iso8601)
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSXXXXX"
         self.responseDecoder.dateDecodingStrategy = .formatted(dateFormatter)
     }
     
