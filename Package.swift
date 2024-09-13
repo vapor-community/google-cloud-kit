@@ -18,6 +18,7 @@ let package = Package(
                 "PubSub",
                 "SecretManager",
                 "Storage",
+                "Vision"
             ]
         ),
         .library(
@@ -47,6 +48,10 @@ let package = Package(
         .library(
             name: "GoogleCloudPubSub",
             targets: ["PubSub"]
+        ),
+        .library(
+            name: "GoogleCloudVision",
+            targets: ["Vision"]
         ),
     ],
     dependencies: [
@@ -104,6 +109,13 @@ let package = Package(
             ],
             path: "PubSub/Sources/"
         ),
+        .target(
+            name: "Vision",
+            dependencies: [
+                .target(name: "Core")
+            ],
+            path: "Vision/Sources"
+        ),
         .testTarget(
             name: "CoreTests",
             dependencies: [
@@ -140,5 +152,12 @@ let package = Package(
             ],
             path: "PubSub/Tests/"
         ),
+        .testTarget(
+            name: "VisionTests",
+            dependencies: [
+                .target(name: "Vision")
+            ],
+            path: "Vision/Tests/"
+        )
     ]
 )
