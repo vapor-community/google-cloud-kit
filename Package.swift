@@ -67,35 +67,50 @@ let package = Package(
             dependencies: [
                 .target(name: "Core")
             ],
-            path: "Storage/Sources/"
+            path: "Storage/Sources/",
+            exclude: [
+                "README.md"
+            ]
         ),
         .target(
             name: "Datastore",
             dependencies: [
                 .target(name: "Core")
             ],
-            path: "Datastore/Sources/"
+            path: "Datastore/Sources/",
+            exclude: [
+                "README.md"
+            ]
         ),
         .target(
             name: "SecretManager",
             dependencies: [
                 .target(name: "Core")
             ],
-            path: "SecretManager/Sources"
+            path: "SecretManager/Sources",
+            exclude: [
+                "README.md"
+            ]
         ),
         .target(
             name: "IAMServiceAccountCredentials",
             dependencies: [
                 .target(name: "Core")
             ],
-            path: "IAMServiceAccountCredentials/Sources"
+            path: "IAMServiceAccountCredentials/Sources",
+            exclude: [
+                "README.md"
+            ]
         ),
         .target(
             name: "Translation",
             dependencies: [
                 .target(name: "Core")
             ],
-            path: "Translation/Sources"
+            path: "Translation/Sources",
+            exclude: [
+                "README.md"
+            ]
         ),
         .target(
             name: "PubSub",
