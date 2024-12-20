@@ -6,7 +6,7 @@ let package = Package(
     name: "google-cloud-kit",
     platforms: [
         .macOS(.v13),
-        .iOS(.v13)
+        .iOS(.v16)
     ],
     products: [
         .library(
@@ -51,7 +51,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/swift-server/async-http-client.git", from: "1.18.0"),
-        .package(url: "https://github.com/vapor/jwt-kit.git", from: "4.13.0")
+        .package(url: "https://github.com/vapor/jwt-kit.git", from: "5.0.0")
     ],
     targets: [
         .target(
