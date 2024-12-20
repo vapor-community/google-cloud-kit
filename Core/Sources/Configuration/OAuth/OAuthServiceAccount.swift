@@ -69,6 +69,8 @@ public class OAuthServiceAccount: OAuthRefreshable {
             return eventLoop.makeFailedFuture(error)
         }
         
-        return eventLoop.makeFutureWithTask { try await JWTKeyCollection().addRS256(key: privateKey).sign(payload) }
+        return eventLoop.makeFutureWithTask {
+            try await JWTKeyCollection().add(rsa: privateKey, digestAlgorithm: .sha256).sign(payload)
+        }
     }
 }
