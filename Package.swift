@@ -18,6 +18,7 @@ let package = Package(
                 "PubSub",
                 "SecretManager",
                 "Storage",
+                "IdentityToolkit"
             ]
         ),
         .library(
@@ -47,6 +48,10 @@ let package = Package(
         .library(
             name: "GoogleCloudPubSub",
             targets: ["PubSub"]
+        ),
+        .library(
+            name: "GoogleCloudIdentityToolkit",
+            targets: ["IdentityToolkit"]
         ),
     ],
     dependencies: [
@@ -103,6 +108,13 @@ let package = Package(
                 .target(name: "Core")
             ],
             path: "PubSub/Sources/"
+        ),
+        .target(
+            name: "IdentityToolkit",
+            dependencies: [
+                .target(name: "Core")
+            ],
+            path: "IdentityToolkit/Sources"
         ),
         .testTarget(
             name: "CoreTests",
