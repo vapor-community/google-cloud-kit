@@ -51,7 +51,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/swift-server/async-http-client.git", from: "1.18.0"),
-        .package(url: "https://github.com/vapor/jwt-kit.git", from: "4.13.0")
+        .package(url: "https://github.com/vapor/jwt-kit.git", from: "5.2.0")
     ],
     targets: [
         .target(
