@@ -413,7 +413,7 @@ public final class GoogleCloudStorageObjectAPI: StorageObjectAPI {
         
         var headers: HTTPHeaders = ["Content-Type": contentType]
         
-        if body.length == nil {
+        if body.contentLength == nil {
             headers.add(name: "Transfer-Encoding", value: "chunked")
         }
         
